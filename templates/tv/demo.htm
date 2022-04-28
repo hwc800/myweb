@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+<meta charset="utf-8">
+<title>����̨�б�</title>
+    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+    </head>
+    <body>
+     
+    <table id="demo" lay-filter="test"></table>
+     
+    <script src="../static/layui/layui.js"></script>
+    <script >
+    layui.use('table', function(){
+      var table = layui.table;
+      
+      //��һ��ʵ��
+      table.render({
+        elem: '#demo'
+        ,height: 312
+        ,url: '../static/json/content/list.js' //���ݽӿ�
+        ,page: true //������ҳ
+        ,cols: [[ //��ͷ
+          {field: 'id', title: 'ID',  sort: true, fixed: 'left'}
+          ,{field: 'label', title: '\u7528\u6237\u540d'}
+          ,{field: 'title', title: '\u6807\u9898',  sort: true}
+          ,{field: 'author', title: '\u4f5c\u8005'} 
+          ,{field: 'content', title: '\u5185\u5bb9'}
+          ,{field: 'uploadtime', title: '\u65f6\u95f4',  sort: true}
+          ,{field: 'status', title: '\u72b6\u6001', sort: true}
+        ]]
+      });
+      
+    });
+    </script>
+    </body>
+    </html>>
+

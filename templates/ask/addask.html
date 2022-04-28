@@ -1,0 +1,363 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>添加问答</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+    <script type="text/javascript">
+        window.UEDITOR_HOME_URL = "/include/ueditor/";
+        //var fenxiaoPriceNum=0;
+    </script>
+
+    <script type="text/javascript" charset="utf-8" src="/include/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/include/ueditor/ueditor.all.js"> </script>
+    <!--建议手动加在语言，避免在ie下有时因为加载语言失败导致编辑器加载失败-->
+    <!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
+    <script type="text/javascript" charset="utf-8" src="/include/ueditor/lang/zh-cn/zh-cn.js"></script>
+
+    <style type="text/css">
+        div{
+            width:100%;
+        }
+        .layui-form-select dl {
+          z-index: 8929;
+        }
+    </style>
+</head>
+<body>
+
+  <div class="layui-form" lay-filter="layuiadmin-app-form-list" id="layuiadmin-app-form-list" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item" id="itemtype_div">
+      <label class="layui-form-label">类型</label>
+      <div class="layui-input-inline" style="width: 150px;">
+        <select name="itemtype_id"  id="itemtype_id" lay-filter="itemtype_id">
+        </select>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">问答标题</label>
+      <div class="layui-input-inline">
+        <input type="hidden" id="id" name="id" lay-verify="required" autocomplete="off" class="layui-input" value="0">
+        <input type="text" name="askTitle"  style="width: 500px;" id="askTitle" lay-verify="required" placeholder="问答标题" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+      <div class="layui-form-item">
+      <label class="layui-form-label">问答介绍</label>
+      <div class="layui-input-inline">
+        <textarea type="text" id="askIntroduce" name="askIntroduce" style="width: 500px; height: 100px;"   placeholder="问答介绍" autocomplete="off" class="layui-input"></textarea>
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label">问答内容</label>
+      <div class="layui-input-inline" name="askContent" id="askContent" style="width: 600px;height:300px;">
+      </div>
+    </div>
+      <div class="layui-form-item">
+          <label class="layui-form-label">球队ID</label>
+          <div class="layui-input-inline">
+              <input type="text" name="teamid"  id="teamid" lay-verify="required" placeholder="问答标题" autocomplete="off" class="layui-input">
+          </div>
+          <label class="layui-form-label">用户ID</label>
+          <div class="layui-input-inline">
+              <input type="text" name="userid" id="userid" lay-verify="required" placeholder="用户编号" autocomplete="off" class="layui-input">
+          </div>
+      </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">开始时间</label>
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" id="showDate" name="showDate" placeholder="yyyy-MM-dd HH:mm:ss">
+            </div>
+        </div>
+      <label class="layui-form-label">发布状态</label>
+      <div class="layui-input-inline">
+        <input type="checkbox" lay-verify="required" lay-filter="isshow" checked name="isshow" id="isshow" lay-skin="switch" lay-text="已发布|待审核">
+      </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+      <input type="button" lay-submit lay-filter="layuiadmin-app-form-submit" id="layuiadmin-app-form-submit" value="确认添加">
+      <input type="button" lay-submit lay-filter="layuiadmin-app-form-edit" id="layuiadmin-app-form-edit" value="确认编辑">
+    </div>
+  </div>
+
+  <script src="../static/layui/layui.js"></script>
+  <script src="../static/js/common.js"></script>
+  <script src="../static/js/jquery-1.7.1.min.js"></script>
+  <script>
+      var timestamp = (new Date()).valueOf();
+      document.write('<script language="javascript" src="/json/data/sporttype.js?v=' + timestamp + '"><\/script\>');
+      document.write('<script language="javascript" src="/json/data/tv_station.js?v=' + timestamp + '"><\/script\>');
+  </script>
+  <script>
+      //实例化编辑器
+      //建议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.getEditor('editor')就能拿到相关的实例
+      var ue = UE.getEditor('askContent');
+      var olddata;
+      //修改初始化数据传入
+      function child(data){
+          olddata=data;
+      }
+
+  layui.config({
+    base: '../static/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index','upload','laydate','colorpicker', 'form'], function(){
+    var $ = layui.$
+        ,upload = layui.upload
+        ,laydate = layui.laydate
+        ,colorpicker = layui.colorpicker
+        ,form = layui.form;
+
+      colorpicker.render({
+          elem: '#fcolor'
+          ,change: function(color){
+              $("#front_color").val(color);
+          }
+      });
+
+      //日期时间范围
+      laydate.render({
+          elem: '#showDate'
+          ,type: 'datetime'
+          , value:local_date(new Date())
+      });
+
+
+      if (olddata != undefined) {
+          var datas = eval(olddata);
+          //console.log(olddata);
+          //表单初始赋值
+          form.val('layuiadmin-app-form-list', {
+              "id": datas["id"] // "name": "value"
+              , "askTitle": datas["askTitle"] // "name": "value"
+              , "askIntroduce": datas["askIntroduce"]
+              , "teamid": datas["teamid"]
+              , "userid": datas["userid"]
+              , "showDate": datas["showDate"]
+              , "isshow": datas["isshow"] == 1 ? false : true //复选框选中状态
+          });
+
+          UE.getEditor('askContent').setContent(datas["askContent"], false);
+
+          form.render(); //刷新select选择框渲染
+      }
+          //主动触发下拉
+          $("#itemtypeid1_div").remove();
+          $("#itemtypeid2_div").remove();
+
+          var obj =  (sporttype_js);
+          if (obj["count"] > 0) {
+              var html = '<option value =0 >请选择分类</option>';
+              for (var a = 0; a < obj["data"].length; a++) {
+                  var obj2 = obj["data"][a];
+                  if(obj2.itemtype_id==0&&obj2.isshow==0) {
+                      html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                  }
+              }
+
+              $('#itemtype_id').append(html);
+              form.render(); //刷新渲染
+              if (olddata != undefined) {
+
+                  if (obj["count"] > 0) {
+                      var html = '<div class="layui-input-inline" id="itemtypeid1_div" style="width: 150px;"><select name="itemtypeid1"  id="itemtypeid1" lay-filter="itemtypeid1" lay-search=""><option value ="" >请选择分类</option>';
+                      for (var a = 0; a < obj["data"].length; a++) {
+                          var obj2 = obj["data"][a];
+                          if (obj2.itemtype_id == datas["itemtype_id"] && obj2.itemtypeid1 == 0 && obj2.isshow == 0) {
+                              html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                          }
+                      }
+                      html = html + ('</select></div>');
+                      $('#itemtype_div').append(html);
+                      form.render(); //刷新渲染
+                      //二级
+
+                      if (obj["count"] > 0) {
+                          var html = '<div class="layui-input-inline" style="width: 150px;" id="itemtypeid2_div"><select name="itemtypeid2"  id="itemtypeid2" lay-filter="itemtypeid2" lay-search=""><option value ="" >请选择分类</option>';
+                          for (var a = 0; a < obj["data"].length; a++) {
+                              var obj2 = obj["data"][a];
+                              if (obj2.itemtype_id == datas["itemtype_id"] && obj2.itemtypeid1 == datas["itemtypeid1"] && obj2.isshow == 0) {
+                                  html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                              }
+                          }
+                          html = html + ('</select></div>');
+                          $('#itemtype_div').append(html);
+                          form.render(); //刷新渲染
+                      }
+                      $("#itemtypeid2").val(datas["itemtypeid2"]);
+                      form.render(); //刷新渲染
+
+                      $("#itemtypeid1").val(datas["itemtypeid1"]);
+                      form.render(); //刷新渲染
+                  }
+                  $("#itemtype_id").val(datas["itemtype_id"]);//初始值
+              }else{
+                  $("#itemtype_id").val(1348);//初始值
+                  var html = '<div class="layui-input-inline" id="itemtypeid1_div" style="width: 150px;"><select name="itemtypeid1"  id="itemtypeid1" lay-filter="itemtypeid1" lay-search=""><option value ="" >请选择分类</option>';
+                  for (var a = 0; a < obj["data"].length; a++) {
+                      var obj2 = obj["data"][a];
+                      if(obj2.itemtype_id==1348&&obj2.itemtypeid1==0&&obj2.isshow==0) {
+                          html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                      }
+                  }
+                  html = html + ('</select></div>');
+                  $('#itemtype_div').append(html);
+              }
+        }
+
+          form.render();
+
+
+
+
+      form.on('select(itemtype_id)', function(data){
+          $("#itemtype").val($("#itemtype_id").find("option:selected").text());
+
+          $("#itemtypeid1_div").remove();
+          $("#itemtypeid2_div").remove();
+          $("#zhibohouse_id").val("");
+          var itemtypeid=$("#itemtype_id").find("option:selected").val();
+
+          var obj =  (sporttype_js);
+          if (obj["count"] > 0) {
+              var html = '<div class="layui-input-inline" id="itemtypeid1_div" style="width: 150px;"><select name="itemtypeid1"  id="itemtypeid1" lay-filter="itemtypeid1" lay-search=""><option value ="" >请选择分类</option>';
+              for (var a = 0; a < obj["data"].length; a++) {
+                  var obj2 = obj["data"][a];
+                  if (obj2.itemtype_id == itemtypeid&&obj2.itemtypeid1==0 && obj2.isshow == 0) {
+                      html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                  }
+              }
+              html = html + ('</select></div>');
+              $('#itemtype_div').append(html);
+              form.render(); //刷新渲染
+          }
+      });
+
+      form.on('select(itemtypeid1)', function(data){
+          $("#itemtypeid2_div").remove();
+          var itemtid1=$("#itemtypeid1").find("option:selected").val();
+
+          var obj =  (sporttype_js);
+          if (obj["count"] > 0) {
+              var html = '<div class="layui-input-inline" style="width: 150px;" id="itemtypeid2_div"><select name="itemtypeid2"  id="itemtypeid2" lay-filter="itemtypeid2" lay-search=""><option value ="" >请选择分类</option>';
+              for (var a = 0; a < obj["data"].length; a++) {
+                  var obj2 = obj["data"][a];
+                  if (obj2.itemtypeid1 == itemtid1 && obj2.isshow == 0) {
+                      html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                  }
+              }
+              html = html + ('</select></div>');
+              $('#itemtype_div').append(html);
+              form.render(); //刷新渲染
+          }
+      });
+    //监听提交
+    form.on('submit(layuiadmin-app-form-submit)', function(data){
+      data.field.askContent=UE.getEditor('askContent').getContent();
+      var field = data.field; //获取提交的字段
+      //var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+      //提交 Ajax 成功后，关闭当前弹层并重载表格
+      //$.ajax({});
+	   $.ajax({
+	  	type:'POST',
+		url:'/json/ask/add_ask.php',
+		data:field,
+		success:function(data)
+		{//执行成功
+            if (checkqx(data)) {
+                //询问框
+                layer.confirm('添加数据成功，关闭当前页！', {
+                    btn: ['关闭', '取消'] //按钮
+                }, function () {
+                    //执行成功
+                    parent.layui.table.reload('LAY-app-content-list'); //重载表格
+                    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                    parent.layer.close(index); //再执行关闭
+                }, function () {
+                    parent.layui.table.reload('LAY-app-content-list'); //重载表格
+                });
+            }
+		},
+		error:function()
+		{
+			//执行失败
+            layer.msg("更新数据失败，请查询错误信息！");
+		}
+	  }
+	  );
+
+      parent.layui.table.reload('LAY-app-content-list'); //重载表格
+      parent.layer.close(index); //再执行关闭 
+    });
+
+      //监听提交
+      form.on('submit(layuiadmin-app-form-edit)', function(data){
+          data.field.askContent=UE.getEditor('askContent').getContent();
+          var field = data.field; //获取提交的字段
+          //var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+          //提交 Ajax 成功后，关闭当前弹层并重载表格
+          //$.ajax({});
+          $.ajax({
+                  type:'POST',
+                  url:'/json/ask/add_ask.php?t=edit',
+                  data:field,
+                  success:function(data)
+                  {//执行成功
+                      if (checkqx(data)) {
+                          layer.confirm('修改数据成功，关闭当前页！', {
+                              btn: ['关闭', '取消'] //按钮
+                          }, function () {
+                              //执行成功
+                              parent.layui.table.reload('LAY-app-content-list'); //重载表格
+                              var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                              parent.layer.close(index); //再执行关闭
+                          }, function () {
+                              parent.layui.table.reload('LAY-app-content-list'); //重载表格
+                          });
+                      }
+                  },
+                  error:function()
+                  {
+                      //执行失败
+                      layer.msg("更新数据失败，请查询错误信息！");
+                  }
+              }
+          );
+          parent.layui.table.reload('LAY-app-content-list'); //重载表格
+      });
+
+  })
+      //时间统一格式化
+      function local_date(time)
+      {
+
+          if(time==undefined || time==null ||time=='')
+          {
+              return '';
+          }else
+          {
+              var date = new Date(time);
+              var month = date.getMonth(time) + 1;
+              var strDate = date.getDate(time);
+              if (month >= 1 && month <= 9) {
+                  month = "0" + month;
+              }
+              if (strDate >= 0 && strDate <= 9) {
+                  strDate = "0" + strDate;
+              }
+              var currentDate = date.getFullYear() + "-" + month + "-" + strDate
+                  + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+              return currentDate;
+          }
+      }
+  </script>
+
+</body>
+</html>

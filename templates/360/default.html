@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>360节目表</title>
+    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../static/style/admin.css" media="all">
+    <style>
+        body{margin: 10px;}
+        .LAY-app-content-list-carousel{height: 200px; line-height: 200px; text-align: center;}
+    </style>
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <a href="javascript:history.back(-1)"><h3><<返回上一页</h3></a>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-inline">
+                <label class="layui-form-label">播放时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="timestar" name="timestar" placeholder="yyyy-MM-dd HH:mm:ss">
+                </div>
+                <label class="layui-inline" style="width: 10px;">~</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="timeend" name="timeend" placeholder="yyyy-MM-dd HH:mm:ss">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-app-contlist-search" id="searchchannel">
+                    <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                </button>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">所属频道</label>
+                <div class="layui-input-inline">
+                    <select name="channelid"  id="channelid"  lay-search="">
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">关键字</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="keywords" name="keywords">
+                </div>
+            </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-app-contlist-search" id="searchbtn">
+                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-card-body">
+
+            <table class="layui-hide" id="LAY-app-content-list" lay-filter="test"></table>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="../static/layui/layui.js"></script>
+<script src="../static/js/common.js"></script>
+
+<script>
+
+    //获取URL参数
+    function GetQueryString(name)
+    {
+        var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);//search,查询？后面的参数，并匹配正则
+        if(r!=null)return  decodeURIComponent(r[2]); return null;
+    }
+    var keyword="";
+    if(GetQueryString("keyword")!=""){
+        keyword=GetQueryString("keyword");
+    }
+    var week="";
+    if(GetQueryString("week")!=""){
+        week=GetQueryString("week");
+    }
+
+    layui.config({
+        version: '1554901097999' //为了更新 js 缓存，可忽略
+        ,base: '../static/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    });
+
+    layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel', 'upload', 'element', 'slider','form'], function(){
+        var $ = layui.$
+            ,laydate = layui.laydate //日期
+            ,laypage = layui.laypage //分页
+            ,layer = layui.layer //弹层
+            ,table = layui.table //表格
+            ,carousel = layui.carousel //轮播
+            ,upload = layui.upload //上传
+            ,element = layui.element //元素操作
+            ,slider = layui.slider //滑块
+            ,form=layui.form; //表单
+
+        laydate.render({
+            elem: '#timestar'
+            , type: 'datetime'
+        });
+        laydate.render({
+            elem: '#timeend'
+            , type: 'datetime'
+        });
+
+        //监听Tab切换
+        element.on('tab(LAY-app-content-list)', function(data){
+            layer.tips('切换了 '+ data.index +'：'+ this.innerHTML, this, {
+                tips: 1
+            });
+        });
+
+        //执行一个 table 实例
+        table.render({
+            elem: '#LAY-app-content-list'
+            ,height: 530
+            ,url: '/json/360/get_search360list.php?keyword='+keyword+"&week="+week //数据接口
+            ,title: '节目'
+            ,page: true //开启分页
+            //,toolbar: 'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+            ,totalRow: false //开启合计行
+            ,cols: [[ //表头
+                {type: 'checkbox', fixed: 'left'}
+                ,{field: 'id', title: 'ID',  sort: true, fixed: 'left', totalRowText: '合计：'}
+
+                ,{field: 'channelname', title: '频道名'}
+                ,{field: 'wikibname', title: 'wiki名'}
+                ,{field: 'wikiid_tvsou', title: 'TvsouWikiID'}
+                ,{field: 'keywords', title: '关键字'}
+                ,{field: 'platform', title: '平台名'}
+                ,{field: 'url', title: '落地页',templet:function(d){
+                        var html= "";
+                        if(parseInt(d.url)!=""){
+                            html=html+"<a href='"+d.url+"' target='_blank' style='color: blue'>【URL】</a>";
+                        }
+                        return html;
+                    }}
+                ,{field: 'playdate', title: '播放时间', width: 165,  sort: true, totalRow: true}
+                // ,{fixed: 'right', width: 165, align:'center', toolbar: '#barLAY-app-content-list'}
+            ]]
+        });
+
+
+
+        //监听搜索
+
+        $("#searchbtn").click(function () {
+            var keywords=$("#keywords").val();
+            var channelid=$("#channelid option:selected").val();
+            var timestar= $("#timestar").val();
+            var timeend= $("#timeend").val();
+
+            if(timestar=="" || timeend==""){
+                layer.msg('检索节目名必须增加时间区间！');
+                return false;
+            }
+            table.reload('LAY-app-content-list',{page:true,method:'get',
+                    where:{keywords:keywords,channelid:channelid,timestar:timestar,timeend:timeend} });//page:true 分页重置为1
+        });
+
+        $("#searchchannel").click(function () {
+            var timestar= $("#timestar").val();
+            var timeend= $("#timeend").val();
+            if(timestar=="" || timeend==""){
+                layer.msg('检索节目名必须增加时间区间！');
+                return false;
+            }
+            //获取直播下拉
+            $('#channelid').html('<option value ="" >请选择频道</option>');
+            $.ajax({
+                type : "POST",
+                url : "/json/360/get_search360channellist.php?timestar="+timestar+"&timeend="+timeend,//请求路径 itemtype_id
+                success : function(data) {
+                    var obj = JSON.parse(data);
+                    var html = '<option value ="" >请选择频道</option>';
+                    if (obj["count"] > 0) {
+                        for (var a = 0; a < obj["data"].length; a++) {
+                            var obj2 = obj["data"][a];
+                            html = html + ('<option value = ' + obj2.channelid + '>'+ obj2.channelname + '</option>');
+                        }
+                    }
+                    $('#channelid').html(html);
+                    form.render("select");//刷新渲染
+                }
+            });
+        });
+
+
+        //分页
+        laypage.render({
+            elem: 'pageLAY-app-content-list' //分页容器的id
+            ,count: 100 //总页数
+            ,skin: '#1E9FFF' //自定义选中色值
+            //,skip: true //开启跳页
+            ,jump: function(obj, first){
+                if(!first){
+                    layer.msg('第'+ obj.curr +'页', {offset: 'b'});
+                }
+            }
+        });
+
+        //上传
+        upload.render({
+            elem: '#uploadLAY-app-content-list'
+            ,url: '' //上传接口
+            ,done: function(res){
+                //console.log(res)
+            }
+        });
+
+        slider.render({
+            elem: '#sliderLAY-app-content-list'
+            ,input: true //输入框
+        });
+
+
+        /*
+        //底部信息
+        var footerTpl = lay('#footer')[0].innerHTML;
+        lay('#footer').html(layui.laytpl(footerTpl).render({}))
+            .removeClass('layui-hide');
+            */
+
+    });
+
+    //弹出子页回传数据，暂时不用，使用重新载入
+    function GetValue(obj){
+        //alert(obj);
+    }
+</script>
+</body>
+</html>

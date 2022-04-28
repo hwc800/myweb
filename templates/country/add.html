@@ -1,0 +1,224 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>添加国家</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+</head>
+<body>
+
+<div class="layui-form" lay-filter="layuiadmin-app-form-list" id="layuiadmin-app-form-list" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">国家中文名</label>
+        <div class="layui-input-inline">
+            <input type="hidden" id="id" name="id" lay-verify="required" autocomplete="off" class="layui-input" value="0">
+            <input type="text" id="cnname" name="cnname" lay-verify="required" placeholder="中文名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">国家英文名</label>
+        <div class="layui-input-inline">
+            <input type="text" id="enname" name="enname" lay-verify="required" placeholder="请输入英文名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">国家图标</label>
+        <div class="layui-input-inline">
+            <p id="demo2"></p>
+            <img class="layui-upload-img" style="width: 60px;" id="logo_img" src=""><button type="button" class="layui-btn" id="btnLogo">上传图片</button>
+            <input type="hidden" id="logo" name="logo" class="layui-input">
+            <p id="errText"></p>
+        </div>
+    </div>
+    <div class="layui-upload">
+
+        <div class="layui-upload-list">
+            <img class="layui-upload-img" id="demo1">
+            <p id="demoText"></p>
+        </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+        <input type="button" lay-submit lay-filter="layuiadmin-app-form-submit" id="layuiadmin-app-form-submit" value="确认添加">
+        <input type="button" lay-submit lay-filter="layuiadmin-app-form-edit" id="layuiadmin-app-form-edit" value="确认编辑">
+    </div>
+</div>
+
+<script src="../static/layui/layui.js"></script>
+<script>
+    var timestamp = (new Date()).valueOf();
+    document.write('<script language="javascript" src="/json/data/country.js?v=' + timestamp + '"><\/script\>');
+</script>
+<script>
+    var olddata;
+    //修改初始化数据传入
+    function child(data){
+        olddata=data;
+    }
+
+    layui.config({
+        base: '../static/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index','upload', 'form'], function(){
+        var $ = layui.$
+            ,upload = layui.upload
+            ,form = layui.form;
+
+
+        //国家赋值->如果是修改则绑定数据
+        var obj = country_js ;
+        if (obj["count"] > 0) {
+                var html = '<option value ="" >请选择</option>';
+                for (var a = 0; a < obj["data"].length; a++) {
+                    var obj2 = obj["data"][a];
+                    html = html + ('<option value = ' + obj2.id + '>' + obj2.tab_cnname + '</option>');
+                }
+                $('#countryid').html(html);
+                form.render();
+                //预加载旧数据
+                if (olddata != undefined) {
+                    var datas = eval(olddata);
+                    //console.log(olddata);
+                    //表单初始赋值
+                    form.val('layuiadmin-app-form-list', {
+                        "id": datas["id"] // "name": "value"
+                        , "cnname": datas["tab_cnname"]
+                        , "enname": datas["tab_enname"]
+                        , "logo": datas["tab_logo"]
+                    });
+                    $("#logo_img").attr("src", datas["tab_logo"]);
+                    $("#countryid").val(datas["tab_countryid"]);
+                    form.render('select'); //刷新select选择框渲染
+                }
+            }
+
+
+        //监听提交
+        form.on('submit(layuiadmin-app-form-submit)', function(data){
+            var field = data.field; //获取提交的字段
+            $.ajax({
+                    type:'POST',
+                    url:'/json/country/add_country.php',
+                    data:field,
+                    success:function(data)
+                    {
+                        if(data.replace(/\s+/g,"")!=""&&JSON.parse(data)["code"]==-1){
+                            layer.msg(obj["msg"], {
+                                offset: '15px'
+                                ,icon: 1
+                                ,time: 1000
+                            }, function(){
+                                parent.layui.admin.events.closeThisTabs();
+                            });
+                        }else {
+                            //询问框
+                            layer.confirm('添加数据成功，关闭当前页！', {
+                                btn: ['关闭', '取消'] //按钮
+                            }, function () {
+                                //执行成功
+                                parent.layui.table.reload('LAY-app-content-list'); //重载表格
+                                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                                parent.layer.close(index); //再执行关闭
+                            }, function () {
+                                parent.layui.table.reload('LAY-app-content-list'); //重载表格
+                            });
+                        }
+                    },
+                    error:function()
+                    {
+                        layer.msg("添加数据失败，请查询错误信息！");
+                    }
+                }
+
+            );
+            parent.layui.table.reload('LAY-app-content-list'); //重载表格
+            parent.layer.close(index); //再执行关闭
+        });
+
+        //监听更新提交
+        form.on('submit(layuiadmin-app-form-edit)', function(data){
+            var field = data.field; //获取提交的字段
+            $.ajax({
+                    type:'POST',
+                    url:'/json/country/add_country.php?t=edit',
+                    data:field,
+                    success:function(data)
+                    {
+                        if(data.replace(/\s+/g,"")!=""&&JSON.parse(data)["code"]==-1){
+                            layer.msg(obj["msg"], {
+                                offset: '15px'
+                                ,icon: 1
+                                ,time: 1000
+                            }, function(){
+                                parent.layui.admin.events.closeThisTabs();
+                            });
+                        }else {
+                            //询问框
+                            layer.confirm('更新数据成功，关闭当前页！', {
+                                btn: ['关闭', '取消'] //按钮
+                            }, function () {
+                                //执行成功
+                                parent.layui.table.reload('LAY-app-content-list'); //重载表格
+                                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                                parent.layer.close(index); //再执行关闭
+                            }, function () {
+                                parent.layui.table.reload('LAY-app-content-list'); //重载表格
+                            });
+                        }
+                    },
+                    error:function()
+                    {
+                        layer.msg("更新数据失败，请查询错误信息！");
+                    }
+
+                }
+
+            );
+        });
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#btnLogo'
+            ,accept:'images'
+            ,url: '//img.tianmaotv.cn/json/common/upload_img.php?t=country'
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#logo_img').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    var demoText = $('#demoText');
+                    demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                    demoText.find('.demo-reload').on('click', function(){
+                        uploadInst.upload();
+                        $('#demoText').html('');
+                    });
+                    return layer.msg('上传失败：'+res.msg);
+                }
+                //上传成功
+                layer.msg("上传成功");
+                $('#logo').val(res.msg);//赋值图片上传地址到隐藏域
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                    $('#demoText').html('');
+                });
+            }
+        });
+
+    })
+</script>
+</body>
+</html>

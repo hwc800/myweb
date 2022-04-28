@@ -1,0 +1,355 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>添加版权</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+  <style>
+    .layui-form-select dl {
+      max-height: 180px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="layui-form" lay-filter="layuiadmin-app-form-list" id="layuiadmin-app-form-list" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item" id="itemtype_div">
+      <label class="layui-form-label">类型</label>
+      <div class="layui-input-inline" style="width: 150px;">
+        <select name="itemtype_id"  id="itemtype_id" lay-filter="itemtype_id">
+        </select>
+        <input type="hidden" id="id" name="id" autocomplete="off" class="layui-input" value="0">
+        <input type="hidden" id="sporttypename" name="sporttypename" autocomplete="off" class="layui-input" value="0">
+       </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">电视台/频道</label>
+      <div class="layui-input-inline">
+        <select name="tvid"  id="tvid" lay-filter="tvid" lay-search="">
+        </select>
+        <input type="hidden" id="tvname" name="tvname" autocomplete="off" class="layui-input" value="0">
+      </div>
+      <div class="layui-input-inline">
+        <select name="channelid"  id="channelid" lay-filter="channelid" lay-search="">
+        </select>
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label">版权状态</label>
+      <div class="layui-input-inline">
+        <input type="checkbox" lay-verify="required" lay-filter="copyright" name="copyright" id="copyright" lay-skin="switch" lay-text="有版权|无版权">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">发布状态</label>
+      <div class="layui-input-inline">
+        <input type="checkbox" lay-verify="required" lay-filter="isshow" name="isshow" id="isshow" lay-skin="switch" lay-text="已发布|待审核">
+      </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+      <input type="button" lay-submit lay-filter="layuiadmin-app-form-submit" id="layuiadmin-app-form-submit" value="确认添加">
+      <input type="button" lay-submit lay-filter="layuiadmin-app-form-edit" id="layuiadmin-app-form-edit" value="确认编辑">
+    </div>
+  </div>
+
+  <script src="../static/layui/layui.js"></script>
+  <script src="../static/js/common.js"></script>
+  <script src="../static/js/jquery-1.7.1.min.js"></script>
+  <script>
+      var timestamp = (new Date()).valueOf();
+      document.write('<script language="javascript" src="/json/data/sporttype.js?v=' + timestamp + '"><\/script\>');
+      document.write('<script language="javascript" src="/json/data/tv_station.js?v=' + timestamp + '"><\/script\>');
+      document.write('<script language="javascript" src="/json/data/tv_channel.js?v=' + timestamp + '"><\/script\>');
+  </script>
+  <script>
+      var olddata;
+      //修改初始化数据传入
+      function child(data){
+          olddata=data;
+      }
+
+  layui.config({
+    base: '../static/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index','upload','colorpicker', 'form'], function(){
+    var $ = layui.$
+        ,upload = layui.upload
+        ,colorpicker = layui.colorpicker
+        ,form = layui.form;
+
+
+      if (olddata != undefined) {
+          var datas = eval(olddata);
+          //console.log(olddata);
+          //表单初始赋值
+          form.val('layuiadmin-app-form-list', {
+              "id": datas["id"] // "name": "value"
+              , "sporttypename": datas["sporttypename"] // "name": "value"
+              , "tvname": datas["tvname"]
+              , "copyright": datas["copyright"] == 1 ? true :false  //复选框选中状态
+              , "isshow": datas["isshow"] == 1 ? false :true  //复选框选中状态
+          });
+          form.render(); //刷新select选择框渲染
+      }
+          //主动触发下拉
+          $("#itemtypeid1_div").remove();
+          $("#itemtypeid2_div").remove();
+
+          var obj =  (sporttype_js);
+          if (obj["count"] > 0) {
+              var html = '<option value =0 >请选择分类</option>';
+              for (var a = 0; a < obj["data"].length; a++) {
+                  var obj2 = obj["data"][a];
+                  if(obj2.itemtype_id==0&&obj2.isshow==0) {
+                      html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                  }
+              }
+
+              $('#itemtype_id').append(html);
+              form.render(); //刷新渲染
+              if (olddata != undefined) {
+
+                  if (obj["count"] > 0) {
+                      var html = '<div class="layui-input-inline" id="itemtypeid1_div" style="width: 150px;"><select name="itemtypeid1"  id="itemtypeid1" lay-filter="itemtypeid1" lay-search=""><option value ="" >请选择分类</option>';
+                      for (var a = 0; a < obj["data"].length; a++) {
+                          var obj2 = obj["data"][a];
+                          if (obj2.itemtype_id == datas["itemtype_id"] && obj2.itemtypeid1 == 0 && obj2.isshow == 0) {
+                              html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                          }
+                      }
+                      html = html + ('</select></div>');
+                      $('#itemtype_div').append(html);
+                      form.render(); //刷新渲染
+                      //二级
+
+                      if (obj["count"] > 0) {
+                          var html = '<div class="layui-input-inline" style="width: 150px;" id="itemtypeid2_div"><select name="itemtypeid2"  id="itemtypeid2" lay-filter="itemtypeid2" lay-search=""><option value ="" >请选择分类</option>';
+                          for (var a = 0; a < obj["data"].length; a++) {
+                              var obj2 = obj["data"][a];
+                              if (obj2.itemtype_id == datas["itemtype_id"] && obj2.itemtypeid1 == datas["itemtypeid1"] && obj2.isshow == 0) {
+                                  html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                              }
+                          }
+                          html = html + ('</select></div>');
+                          $('#itemtype_div').append(html);
+                          form.render(); //刷新渲染
+                      }
+                      $("#itemtypeid2").val(datas["itemtypeid2"]);
+                      form.render(); //刷新渲染
+
+                      $("#itemtypeid1").val(datas["itemtypeid1"]);
+                      form.render(); //刷新渲染
+                  }
+                  $("#itemtype_id").val(datas["itemtype_id"]);//初始值
+              }
+        }
+
+          //如果是修改则绑定数据
+      var obj = tv_station_js;
+      if (obj["count"] > 0) {
+          var html = '<option value ="">请选择电视台</option>';
+          for (var a = 0; a < obj["data"].length; a++) {
+              var obj2 = obj["data"][a];
+              if(obj2.tab_status==0) {
+                  html = html + ('<option value = ' + obj2.id + '>' + obj2.tab_cnname + '</option>');
+              }
+          }
+          $('#tvid').html(html);
+          form.render('select'); //刷新select选择框渲染
+      }
+      if (olddata != undefined) {
+          var datas = eval(olddata);
+          var tvid = datas["tvid"];
+          var channelid = datas["channelid"];
+          //电视频道存在
+          if (tvid != undefined) {
+              var obj =  (tvchannel_js);
+              if (obj["count"] > 0) {
+                  var html = '<option value ="" >请选择频道</option>';
+                  for (var a = 0; a < obj["data"].length; a++) {
+                      var obj2 = obj["data"][a];
+                      if (obj2.tab_tvid == tvid && obj2.tab_status == 0) {
+                          html = html + ('<option value = ' + obj2.id + '>' + obj2.tab_channelname + '</option>');
+                      }
+                  }
+                  $('#channelid').html(html);
+              }
+              $("#tvid").val(datas["tvid"]);
+              $("#channelid").val(datas["channelid"]);
+              form.render('select'); //刷新select选择框渲染
+          }
+      }
+
+
+
+      form.on('select(itemtype_id)', function(data){
+          $("#itemtype").val($("#itemtype_id").find("option:selected").text());
+
+          $("#itemtypeid1_div").remove();
+          $("#itemtypeid2_div").remove();
+          $("#zhibohouse_id").val("");
+          var itemtypeid=$("#itemtype_id").find("option:selected").val();
+
+          if($("#itemtype_id").find("option:selected").val()>0){
+              $("#sporttypename").val($("#itemtype_id").find("option:selected").text());
+          }
+          var obj =  (sporttype_js);
+          if (obj["count"] > 0) {
+              var html = '<div class="layui-input-inline" id="itemtypeid1_div" style="width: 150px;"><select name="itemtypeid1"  id="itemtypeid1" lay-filter="itemtypeid1" lay-search=""><option value ="" >请选择分类</option>';
+              for (var a = 0; a < obj["data"].length; a++) {
+                  var obj2 = obj["data"][a];
+                  if (obj2.itemtype_id == itemtypeid&&obj2.itemtypeid1==0 && obj2.isshow == 0) {
+                      html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                  }
+              }
+              html = html + ('</select></div>');
+              $('#itemtype_div').append(html);
+              form.render(); //刷新渲染
+          }
+      });
+
+      form.on('select(itemtypeid1)', function(data){
+          $("#itemtypeid2_div").remove();
+          var itemtid1=$("#itemtypeid1").find("option:selected").val();
+          if($("#itemtypeid1").find("option:selected").val()>0){
+              $("#sporttypename").val($("#itemtypeid1").find("option:selected").text());
+          }
+          var obj =  (sporttype_js);
+          if (obj["count"] > 0) {
+              var html = '<div class="layui-input-inline" style="width: 150px;" id="itemtypeid2_div"><select name="itemtypeid2"  id="itemtypeid2" lay-filter="itemtypeid2" lay-search=""><option value ="" >请选择分类</option>';
+              for (var a = 0; a < obj["data"].length; a++) {
+                  var obj2 = obj["data"][a];
+                  if (obj2.itemtypeid1 == itemtid1 && obj2.isshow == 0) {
+                      html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                  }
+              }
+              html = html + ('</select></div>');
+              $('#itemtype_div').append(html);
+              form.render(); //刷新渲染
+          }
+      });
+      form.on('select(itemtypeid2)', function(data){
+          if($("#itemtypeid2").find("option:selected").val()>0){
+              $("#sporttypename").val($("#itemtypeid2").find("option:selected").text());
+          }
+      });
+      //电视台下拉触发事件
+      form.on('select(tvid)', function(data){
+          //console.log(data);
+          var tvid=data["value"];
+          if($("#tvid").find("option:selected").val()>0){
+              $("#tvname").val($("#tvid").find("option:selected").text());
+           }
+          var obj = (tvchannel_js);
+          if (obj["count"] > 0) {
+              var html = '<option value ="" >请选择频道</option>';
+              for (var a = 0; a < obj["data"].length; a++) {
+                  var obj2 = obj["data"][a];
+                  if (obj2.tab_tvid == tvid && obj2.tab_status == 0) {
+                      html = html + ('<option value = ' + obj2.id + '>' + obj2.tab_channelname + '</option>');
+                  }
+              }
+              $('#channelid').html(html);
+              form.render();
+          }
+          // $("#channel_name").val("");
+      });
+      // //频道下拉触发事件
+      // form.on('select(channelid)', function(data){
+      //     if($("#channelid").find("option:selected").val()>0){
+      //         $("#channel_name").val($("#channelid").find("option:selected").text());
+      //     }else{
+      //         $("#channel_name").val("");
+      //     }
+      // });
+
+    //监听提交
+    form.on('submit(layuiadmin-app-form-submit)', function(data){
+      var field = data.field; //获取提交的字段
+      //提交 Ajax 成功后，关闭当前弹层并重载表格
+      //$.ajax({});
+	   $.ajax({
+	  	type:'POST',
+		url:'/json/copyright/add_copyright.php',
+		data:field,
+		success:function(data)
+		{//执行成功
+            if (checkqx(data)) {
+                //询问框
+                layer.confirm('添加数据成功，关闭当前页！', {
+                    btn: ['关闭', '取消'] //按钮
+                }, function () {
+                    //执行成功
+                    parent.layui.table.reload('LAY-app-content-list'); //重载表格
+                    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                    parent.layer.close(index); //再执行关闭
+                }, function () {
+                    parent.layui.table.reload('LAY-app-content-list'); //重载表格
+                });
+            }else{
+                // layer.msg(JSON.parse(data)["msg"], {
+                //     offset: '15px'
+                //     ,icon: 1
+                //     ,time: 1000
+                // }, function(){
+                //     parent.layui.admin.events.closeThisTabs();
+                // });
+            }
+		},
+		error:function()
+		{
+			//执行失败
+            layer.msg("更新数据失败，请查询错误信息！");
+		}
+	  }
+	  );
+
+      parent.layui.table.reload('LAY-app-content-list'); //重载表格
+      //parent.layer.close(index); //再执行关闭
+    });
+
+      //监听提交
+      form.on('submit(layuiadmin-app-form-edit)', function(data){
+          var field = data.field; //获取提交的字段
+          //提交 Ajax 成功后，关闭当前弹层并重载表格
+          //$.ajax({});
+          $.ajax({
+                  type:'POST',
+                  url:'/json/copyright/add_copyright.php?t=edit',
+                  data:field,
+                  success:function(data)
+                  {//执行成功
+                      if (checkqx(data)) {
+                          layer.confirm('修改数据成功，关闭当前页！', {
+                              btn: ['关闭', '取消'] //按钮
+                          }, function () {
+                              //执行成功
+                              parent.layui.table.reload('LAY-app-content-list'); //重载表格
+                              var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                              parent.layer.close(index); //再执行关闭
+                          }, function () {
+                              parent.layui.table.reload('LAY-app-content-list'); //重载表格
+                          });
+                      }
+                  },
+                  error:function()
+                  {
+                      //执行失败
+                      layer.msg("更新数据失败，请查询错误信息！");
+                  }
+              }
+          );
+          parent.layui.table.reload('LAY-app-content-list'); //重载表格
+      });
+  })
+
+  </script>
+</body>
+</html>

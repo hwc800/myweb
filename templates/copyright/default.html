@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>版权列表</title>
+    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../static/style/admin.css" media="all">
+    <style>
+        body{margin: 10px;}
+        .LAY-app-content-list-carousel{height: 200px; line-height: 200px; text-align: center;}
+    </style>
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-inline">
+                <label class="layui-form-label">所属TV</label>
+                <div class="layui-input-inline">
+                    <select name="tvid"  id="tvid"  lay-search="">
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline" id="itemtype_div">
+                <label class="layui-form-label">类型</label>
+                <div class="layui-input-inline" style="width: 150px;">
+                    <select name="itemtype_id"  id="itemtype_id" lay-filter="itemtype_id">
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">关键字</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="keywords" name="keywords">
+                </div>
+            </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-app-contlist-search" id="searchbtn">
+                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-card-body">
+
+            <table class="layui-hide" id="LAY-app-content-list" lay-filter="test"></table>
+        </div>
+    </div>
+</div>
+<script type="text/html" id="barLAY-app-content-list">
+    <!-- <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a> -->
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<style type="text/css">
+    .layui-table-cell{height: 70px;}
+
+</style>
+<script src="../static/layui/layui.js"></script>
+<script src="../static/js/common.js"></script>
+<script>
+    var timestamp = (new Date()).valueOf();
+    document.write('<script language="javascript" src="/json/data/sporttype.js?v=' + timestamp + '"><\/script\>');
+</script>
+<script>
+    layui.config({
+        version: '1554901097999' //为了更新 js 缓存，可忽略
+        ,base: '../static/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    });
+
+    layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel', 'upload', 'element', 'slider','form'], function(){
+        var $ = layui.$
+            ,laydate = layui.laydate //日期
+            ,laypage = layui.laypage //分页
+            ,layer = layui.layer //弹层
+            ,table = layui.table //表格
+            ,carousel = layui.carousel //轮播
+            ,upload = layui.upload //上传
+            ,element = layui.element //元素操作
+            ,slider = layui.slider //滑块
+            ,form=layui.form; //表单
+
+        //获取直播下拉
+        $('#channelid').html('<option value ="" >请选择电视台</option>');
+        $.ajax({
+            type : "POST",
+            url : "/json/copyright/get_searchtvlist.php",//请求路径 itemtype_id
+            success : function(data) {
+                var obj = JSON.parse(data);
+                var html = '<option value ="" >请选择电视台</option>';
+                if (obj["count"] > 0) {
+                    for (var a = 0; a < obj["data"].length; a++) {
+                        var obj2 = obj["data"][a];
+                        html = html + ('<option value = ' + obj2.tvid + '>'+ obj2.tvname + '</option>');
+                    }
+                }
+                $('#tvid').html(html);
+                form.render("select");//刷新渲染
+            }
+        });
+
+        //主动触发下拉
+        $("#itemtypeid1_div").remove();
+        $("#itemtypeid2_div").remove();
+
+        var obj = (sporttype_js);
+        if (obj["count"] > 0) {
+            var html = '<option value =0 >请选择分类</option>';
+            for (var a = 0; a < obj["data"].length; a++) {
+                var obj2 = obj["data"][a];
+                if(obj2.itemtype_id==0&&obj2.isshow==0) {
+                    html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                }
+            }
+            $('#itemtype_id').append(html);
+            form.render(); //刷新渲染
+        }
+
+
+        //类型下拉触发事件
+        form.on('select(itemtype_id)', function(data){
+            $("#itemtypeid1_div").remove();
+            $("#itemtypeid2_div").remove();
+            $("#zhibohouse_id").val("");
+            var itemtypeid=$("#itemtype_id").find("option:selected").val();
+
+            var obj =  (sporttype_js);
+            if (obj["count"] > 0) {
+                var html = '<div class="layui-input-inline" id="itemtypeid1_div" style="width: 150px;"><select name="itemtypeid1"  id="itemtypeid1" lay-filter="itemtypeid1" lay-search=""><option value ="" >请选择分类</option>';
+                for (var a = 0; a < obj["data"].length; a++) {
+                    var obj2 = obj["data"][a];
+                    if (obj2.itemtype_id == itemtypeid&&obj2.itemtypeid1==0 && obj2.isshow == 0) {
+                        html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                    }
+                }
+                html = html + ('</select></div>');
+                $('#itemtype_div').append(html);
+                form.render(); //刷新渲染
+            }
+
+        });
+        form.on('select(itemtypeid1)', function(data){
+            $("#itemtypeid2_div").remove();
+            var itemtid1=$("#itemtypeid1").find("option:selected").val();
+
+            var obj =  (sporttype_js);
+            if (obj["count"] > 0) {
+                var html = '<div class="layui-input-inline" style="width: 150px;" id="itemtypeid2_div"><select name="itemtypeid2"  id="itemtypeid2" lay-filter="itemtypeid2" lay-search=""><option value ="" >请选择分类</option>';
+                for (var a = 0; a < obj["data"].length; a++) {
+                    var obj2 = obj["data"][a];
+                    if (obj2.itemtypeid1 == itemtid1 && obj2.isshow == 0) {
+                        html = html + ('<option value = ' + obj2.id + '>' + obj2.typename + '</option>');
+                    }
+                }
+                html = html + ('</select></div>');
+                $('#itemtype_div').append(html);
+                form.render(); //刷新渲染
+            }
+
+        });
+
+
+        //监听Tab切换
+        element.on('tab(LAY-app-content-list)', function(data){
+            layer.tips('切换了 '+ data.index +'：'+ this.innerHTML, this, {
+                tips: 1
+            });
+        });
+
+        //执行一个 table 实例
+        table.render({
+            elem: '#LAY-app-content-list'
+            ,height: 530
+            ,url: '/json/copyright/get_searchcopyrightlist.php' //数据接口
+            ,title: '节目'
+            ,page: true //开启分页
+            ,toolbar: 'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+            ,totalRow: false //开启合计行
+            ,cols: [[ //表头
+                {type: 'checkbox', fixed: 'left'}
+                ,{field: 'id', title: 'ID',  sort: true, fixed: 'left', totalRowText: '合计：'}
+                ,{field: 'tvname', title: '平台名称'}
+                ,{field: 'sporttypename', title: '分类名'}
+                ,{field: 'copyright', title: '版权',templet:function(d){
+                        var html= "<font color='red'>无版权</font>";
+                        if(parseInt(d.copyright)=="1"){
+                            html="有版权";
+                        }
+                        return html;
+                    }}
+                ,{field: 'isshow', title: '状态',  sort: true, totalRow: true,templet:function(d){
+                        var html="";
+                        if(d.isshow == "0"){
+                            html= html+"正常";
+                        }else{
+                            html= html+"<span style='color: red;'>待审核</span>";
+                        }
+                        return html;
+                    }}
+                ,{field: 'creattime', title: '时间', sort: true, totalRow: true}
+                ,{fixed: 'right', width: 165, align:'center', toolbar: '#barLAY-app-content-list'}
+            ]]
+        });
+
+
+
+        //监听搜索
+
+        $("#searchbtn").click(function () {
+            var keywords=$("#keywords").val();
+            var tvid=$("#tvid option:selected").val();
+            var itemtype_id=  $("#itemtype_id").val();
+            var itemtypeid1= $("#itemtypeid1").val();
+            var itemtypeid2= $("#itemtypeid2").val();
+            table.reload('LAY-app-content-list',{page:true,method:'get',
+                    where:{keywords:keywords,tvid:tvid,itemtype_id:itemtype_id,itemtypeid1:itemtypeid1,itemtypeid2:itemtypeid2} });//page:true 分页重置为1
+        });
+
+        //监听头工具栏事件
+        table.on('toolbar(test)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id)
+                ,data = checkStatus.data; //获取选中的数据
+            switch(obj.event){
+                case 'add':
+                    //layer.msg('添加');
+                    layer.open
+                    (
+                        {
+                            type: 2
+                            ,title: '添加版权'
+                            ,content: 'addcopyright.html'
+                            ,maxmin: true
+                            ,area: ['650px', '350px']
+                            ,btn: ['确定', '取消']
+                            ,yes: function(index, layero)
+                            {
+                                //点击确认触发 iframe 内容中的按钮提交
+                                var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-submit");
+                                submit.click();
+                                //parent.close(index); //关闭添加页面;
+                            }
+                        }
+
+                    );
+                    break;
+                case 'update':
+                    if(data.length === 0){
+                        layer.msg('请选择一行');
+                    } else if(data.length > 1){
+                        layer.msg('只能同时编辑一个');
+                    } else {
+                        //layer.alert('编辑 [id]：'+ checkStatus.data[0].id);
+                        layer.open
+                        (
+                            {
+                                type: 2
+                                ,title: '修改版权'
+                                ,content: 'addcopyright.html'
+                                ,maxmin: true
+                                ,area: ['650px', '350px']
+                                ,btn: ['确定', '取消']
+                                ,yes: function(index, layero)
+                                {
+                                    //点击确认触发 iframe 内容中的按钮提交
+                                    var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-edit");
+                                    submit.click();
+                                    //parent.close(index); //关闭添加页面;
+                                },success:function (layero,index) {
+                                    var iframe = window['layui-layer-iframe' + index];
+                                    iframe.child(checkStatus.data[0]);
+                                }
+                            }
+                        );
+                    }
+                    break;
+                case 'delete':
+                    layer.confirm('真的删除行么', function(index) {
+                        if (data.length === 0) {
+                            layer.msg('请选择一行');
+                        } else {
+
+                            var idlist = "0";
+                            for (var a = 0; a < data.length; a++) {
+                                idlist = idlist + "," + data[a].id;
+                            }
+                            //layer.msg('删除');
+                            //批量删除
+                            var postdata = "ids=" + idlist;
+                            $.ajax({
+                                type: 'POST',
+                                url: '/json/copyright/del_copyright.php',
+                                data: postdata,
+                                success: function (data) {
+                                    if (checkqx(data)) {
+                                        if (data == "") {
+                                            //执行成功
+                                            alert('删除成功');
+                                            window.location.reload();
+                                            //layer.close(data);
+                                            //obj.del(); //删除对应行（tr）的DOM结构
+                                            //layer.close(data);
+                                        } else {
+                                            alert(data);
+                                        }
+                                    }
+                                },
+                                error: function () {
+                                    layer.msg('删除失败！');
+                                }
+
+                            });
+                        }
+                    });
+
+                    break;
+            };
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){ //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+            var data = obj.data //获得当前行数据
+                ,layEvent = obj.event; //获得 lay-event 对应的值
+            if(layEvent === 'detail'){
+                layer.msg('查看操作');
+            } else if(layEvent === 'del'){
+                layer.confirm('真的删除行么', function(index)
+                {
+                    var postdata='id='+data.id;
+                    //向服务端发送删除指令
+                    $.ajax({
+                        type:'POST',
+                        url:'/json/copyright/del_copyright.php',
+                        data:postdata,
+                        success:function(data1)
+                        {
+                            if (checkqx(data1)) {
+                                if (data1 == "") {
+                                    //执行成功
+                                    layer.msg('类型id:' + data.id + '删除成功');
+                                    obj.del(); //删除对应行（tr）的DOM结构
+                                    layer.close(index);
+                                } else {
+                                    alert(data1);
+                                }
+                            }
+                        },
+                        error:function()
+                        {
+                            layer.msg('删除失败！');
+                        }
+                    });
+                });
+            } else if(layEvent === 'edit'){
+                layer.open
+                (
+                    {
+                        type: 2
+                        ,title: '修改版权'
+                        ,content: 'addcopyright.html'
+                        ,maxmin: true
+                        ,area: ['650px', '350px']
+                        ,btn: ['确定', '取消']
+                        ,yes: function(index, layero)
+                        {
+                            //点击确认触发 iframe 内容中的按钮提交
+                            var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-edit");
+                            submit.click();
+                            //parent.close(index); //关闭添加页面;
+                        },success:function (layero,index) {
+                            var iframe = window['layui-layer-iframe' + index];
+                            iframe.child(data);
+                        }
+                    }
+                );
+                //layer.msg('编辑操作');
+            }
+        });
+
+        //分页
+        laypage.render({
+            elem: 'pageLAY-app-content-list' //分页容器的id
+            ,count: 100 //总页数
+            ,skin: '#1E9FFF' //自定义选中色值
+            //,skip: true //开启跳页
+            ,jump: function(obj, first){
+                if(!first){
+                    layer.msg('第'+ obj.curr +'页', {offset: 'b'});
+                }
+            }
+        });
+
+        //上传
+        upload.render({
+            elem: '#uploadLAY-app-content-list'
+            ,url: '' //上传接口
+            ,done: function(res){
+                //console.log(res)
+            }
+        });
+
+        slider.render({
+            elem: '#sliderLAY-app-content-list'
+            ,input: true //输入框
+        });
+
+
+        /*
+        //底部信息
+        var footerTpl = lay('#footer')[0].innerHTML;
+        lay('#footer').html(layui.laytpl(footerTpl).render({}))
+            .removeClass('layui-hide');
+            */
+
+    });
+
+    //弹出子页回传数据，暂时不用，使用重新载入
+    function GetValue(obj){
+        //alert(obj);
+    }
+</script>
+</body>
+</html>

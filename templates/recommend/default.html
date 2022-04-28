@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>推荐表</title>
+    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../static/style/admin.css" media="all">
+    <style>
+        body{margin: 10px;}
+        .LAY-app-content-list-carousel{height: 200px; line-height: 200px; text-align: center;}
+    </style>
+</head>
+<body>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">节目名称</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="keywords" id="keywords" placeholder="请输入" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">类型</label>
+                    <div class="layui-input-inline">
+                        <select name="typeid"  id="typeid">
+                            <option value = ''>请选择</option>
+                            <option value = '1'>电影</option>
+                            <option value = '2'>电视剧</option>
+                            <option value = '3'>综艺</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">所属电视台</label>
+                    <div class="layui-input-inline">
+                        <select name="tvid"  id="tvid"   lay-filter="tvid" lay-search="">
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">所属频道</label>
+                    <div class="layui-input-inline">
+                        <select name="channelid"  id="channelid"   lay-search="">
+                        </select>
+                    </div>
+                </div>
+
+                <div class="layui-inline">
+                    <label class="layui-form-label">播放时间</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" id="playtimestar" name="playtimestar" placeholder="yyyy-MM-dd HH:mm:ss">
+                    </div>
+                    <label class="layui-form-label" style="width: 10px;">~</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" id="playtimeend" name="playtimeend" placeholder="yyyy-MM-dd HH:mm:ss">
+                    </div>
+                </div>
+
+                <div class="layui-inline">
+                    <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-app-contlist-search" id="searchbtn">
+                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-card-body">
+
+            <table class="layui-hide" id="LAY-app-content-list" lay-filter="test"></table>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script type="text/html" id="barLAY-app-content-list">
+    <!-- <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a> -->
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script src="../static/layui/layui.js"></script>
+<script src="../static/js/common.js"></script>
+<script>
+    var timestamp = (new Date()).valueOf();
+    document.write('<script language="javascript" src="/json/data/tv_station.js?v=' + timestamp + '"><\/script\>');
+    document.write('<script language="javascript" src="/json/data/tv_channel.js?v=' + timestamp + '"><\/script\>');
+</script>
+<script>
+    layui.config({
+        version: '1554901097999' //为了更新 js 缓存，可忽略
+        ,base: '../static/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    });
+
+    layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel', 'upload', 'element', 'slider','form'], function(){
+        var $ = layui.$
+            ,laydate = layui.laydate //日期
+            ,laypage = layui.laypage //分页
+            ,layer = layui.layer //弹层
+            ,table = layui.table //表格
+            ,carousel = layui.carousel //轮播
+            ,upload = layui.upload //上传
+            ,element = layui.element //元素操作
+            ,slider = layui.slider //滑块
+            ,form=layui.form; //表单
+
+
+        laydate.render({
+            elem: '#playtimestar'
+            , type: 'datetime'
+        });
+        laydate.render({
+            elem: '#playtimeend'
+            , type: 'datetime'
+        });
+
+        //向世界问个好
+        // layer.msg('Hello World'); 弹出消息
+
+        //绑定搜索框电视台下拉
+        var obj =tv_station_js;
+        if (obj["count"] > 0) {
+            var html = '<option value ="" >请选择电视台</option>';
+            for (var a = 0; a < obj["data"].length; a++) {
+                var obj2 = obj["data"][a];
+                if(obj2.tab_status==0){
+                    html = html + ('<option value = ' + obj2.id + '>' + obj2.tab_cnname + '</option>');
+                }
+            }
+            $('#tvid').html(html);
+            form.render();
+        }
+
+        //电视台下拉触发事件
+        form.on('select(tvid)', function(data){
+            //console.log(data);
+            var tvid= data["value"];
+
+            var obj =(tvchannel_js);
+            if (obj["count"] > 0) {
+                var html = '<option value ="" >请选择频道</option>';
+                for (var a = 0; a < obj["data"].length; a++) {
+                    var obj2 = obj["data"][a];
+                    if (obj2.tab_tvid == tvid && obj2.tab_status == 0) {
+                        html = html + ('<option value = ' + obj2.id + '>' + obj2.tab_channelname + '</option>');
+                    }
+                }
+                $('#channelid').html(html);
+                form.render();
+            }
+
+        });
+
+        //监听Tab切换
+        element.on('tab(LAY-app-content-list)', function(data){
+            layer.tips('切换了 '+ data.index +'：'+ this.innerHTML, this, {
+                tips: 1
+            });
+        });
+
+        //执行一个 table 实例
+        table.render({
+            elem: '#LAY-app-content-list'
+            ,height: 530
+            ,url: '/json/recommend/get_recommendlist.php' //数据接口
+            ,title: '节目'
+            ,page: true //开启分页
+            ,toolbar: 'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+            ,totalRow: false //开启合计行
+            ,cols: [[ //表头
+                {type: 'checkbox', fixed: 'left'}
+                ,{field: 'id', title: 'ID',  sort: true, fixed: 'left', totalRowText: '合计：'}
+                ,{field: 'title', title: '节目名',width : 200,templet:function(d){
+                        var html= d.title;
+                        if(parseInt(d.isshow)==1){
+                            html=html+"<span style='color:red ;'>【不显示】</span>";
+                        }
+                        return html;
+                    }}
+                ,{field: 'typename', title: '所属类型'}
+                ,{field: 'channelname', title: '频道名称'}
+                ,{field: 'imgurl', title: '节目图片',templet:'<div><img width="50px" src="{{ d.imgurl }}"></div>'}
+                ,{field: 'wikiid',width : 110, title: 'tvsou_newsid', sort: true, totalRow: true}
+                ,{field: 'createtime', title: '创建时间', sort: true, totalRow: true}
+                ,{field: 'playtime', title: '播放时间', sort: true, totalRow: true}
+                ,{fixed: 'right', width: 165, align:'center', toolbar: '#barLAY-app-content-list'}
+            ]]
+        });
+
+
+        //监听头工具栏事件
+        table.on('toolbar(test)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id)
+                ,data = checkStatus.data; //获取选中的数据
+            switch(obj.event){
+                case 'add':
+                    //layer.msg('添加');
+                    layer.open
+                    (
+                        {
+                            type: 2
+                            ,title: '添加推荐'
+                            ,content: 'add.html'
+                            ,maxmin: true
+                            ,area: ['650px', '700px']
+                            ,btn: ['确定', '取消']
+                            ,yes: function(index, layero)
+                            {
+                                //点击确认触发 iframe 内容中的按钮提交
+                                var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-submit");
+                                submit.click();
+                                //parent.close(index); //关闭添加页面;
+                            }
+                        }
+
+                    );
+                    break;
+                case 'update':
+                    if(data.length === 0){
+                        layer.msg('请选择一行');
+                    } else if(data.length > 1){
+                        layer.msg('只能同时编辑一个');
+                    } else {
+                        //layer.alert('编辑 [id]：'+ checkStatus.data[0].id);
+                        layer.open
+                        (
+                            {
+                                type: 2
+                                ,title: '修改推荐'
+                                ,content: 'add.html'
+                                ,maxmin: true
+                                ,area: ['650px', '700px']
+                                ,btn: ['确定', '取消']
+                                ,yes: function(index, layero)
+                                {
+                                    //点击确认触发 iframe 内容中的按钮提交
+                                    var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-edit");
+                                    submit.click();
+                                    //parent.close(index); //关闭添加页面;
+                                },success:function (layero,index) {
+                                    var iframe = window['layui-layer-iframe' + index];
+                                    iframe.child(checkStatus.data[0]);
+                                }
+                            }
+                        );
+                    }
+                    break;
+                case 'delete':
+                    layer.confirm('真的删除行么', function(index) {
+                        if (data.length === 0) {
+                            layer.msg('请选择一行');
+                        } else {
+
+                            var idlist = "0";
+                            for (var a = 0; a < data.length; a++) {
+                                idlist = idlist + "," + data[a].id;
+                            }
+                            //layer.msg('删除');
+                            //批量删除
+                            var postdata = "ids=" + idlist;
+                            $.ajax({
+                                type: 'POST',
+                                url: '/json/recommend/del_recommend.php',
+                                data: postdata,
+                                success: function (data) {
+                                    if (checkqx(data)) {
+                                        //执行成功
+                                        alert('删除成功');
+                                        window.location.reload();
+                                        //layer.close(data);
+                                        //obj.del(); //删除对应行（tr）的DOM结构
+                                        //layer.close(data);
+                                    }
+                                },
+                                error: function () {
+                                    layer.msg('删除失败！');
+                                }
+
+                            });
+                        }
+                    });
+
+                    break;
+            }
+        });
+
+        //搜索功能
+
+
+        //监听搜索
+
+        $("#searchbtn").click(function () {
+            var keywords=$("#keywords").val();
+            var typeid= $("#typeid option:selected").val();
+            var tvid= $("#tvid option:selected").val();
+            var channelid=$("#channelid option:selected").val();
+            var playtimestar= $("#playtimestar").val();
+            var playtimeend= $("#playtimeend").val();
+            //if(tvid==0||(tvid>0&&(channelid>0||$("#channelid option").length==0))){
+                table.reload('LAY-app-content-list',{page:true,method:'get',
+                    where:{keywords:keywords,typeid:typeid,tvid:tvid,channelid:channelid,playtimestar:playtimestar,playtimeend:playtimeend} });//page:true 分页重置为1
+            // }else{
+            //     layer.msg("请选择频道！");
+            //     return;
+            // }
+        });
+        // form.on('submit(LAY-app-contlist-search)', function(data){
+        //     var field = data.field;
+        //
+        //     //执行重载
+        //     table.reload('LAY-app-content-list', {
+        //         where: field
+        //     });
+        // });
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){ //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+            var data = obj.data //获得当前行数据
+                ,layEvent = obj.event; //获得 lay-event 对应的值
+            if(layEvent === 'detail'){
+                layer.msg('查看操作');
+            } else if(layEvent === 'del'){
+                layer.confirm('真的删除行么', function(index)
+                {
+
+                    var postdata='id='+data.id;
+                    //向服务端发送删除指令
+                    $.ajax({
+                        type:'POST',
+                        url:'/json/recommend/del_recommend.php',
+                        data:postdata,
+                        success:function(data2)
+                        {
+                            if (checkqx(data2)) {
+                                //执行成功
+                                layer.msg('节目id:' + data.id + '删除成功');
+                                obj.del(); //删除对应行（tr）的DOM结构
+                                layer.close(index);
+                            }
+                        },
+                        error:function()
+                        {
+                            layer.msg('删除失败！');
+                        }
+                    });
+                });
+            } else if(layEvent === 'edit'){
+                layer.open
+                (
+                    {
+                        type: 2
+                        ,title: '修改推荐'
+                        ,content: 'add.html'
+                        ,maxmin: true
+                        ,area: ['650px', '700px']
+                        ,btn: ['确定', '取消']
+                        ,yes: function(index, layero)
+                        {
+                            //点击确认触发 iframe 内容中的按钮提交
+                            var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-edit");
+                            submit.click();
+                            //parent.close(index); //关闭添加页面;
+                        },success:function (layero,index) {
+                            var iframe = window['layui-layer-iframe' + index];
+                            iframe.child(data);
+                        }
+                    }
+                );
+                //layer.msg('编辑操作');
+            }
+        });
+
+        /*
+        //执行一个轮播实例
+        carousel.render({
+            elem: '#test1'
+            ,width: '100%' //设置容器宽度
+            ,height: 200
+            ,arrow: 'none' //不显示箭头
+            ,anim: 'fade' //切换动画方式
+        });
+
+        //将日期直接嵌套在指定容器中
+        var dateIns = laydate.render({
+            elem: '#laydateLAY-app-content-list'
+            ,position: 'static'
+            ,calendar: true //是否开启公历重要节日
+            ,mark: { //标记重要日子
+                '0-10-14': '生日'
+                ,'2018-08-28': '新版'
+                ,'2018-10-08': '神秘'
+            }
+            ,done: function(value, date, endDate){
+                if(date.year == 2017 && date.month == 11 && date.date == 30){
+                    dateIns.hint('一不小心就月底了呢');
+                }
+            }
+            ,change: function(value, date, endDate){
+                layer.msg(value)
+            }
+        });
+        */
+
+        //分页
+        laypage.render({
+            elem: 'pageLAY-app-content-list' //分页容器的id
+            ,count: 100 //总页数
+            ,skin: '#1E9FFF' //自定义选中色值
+            //,skip: true //开启跳页
+            ,jump: function(obj, first){
+                if(!first){
+                    layer.msg('第'+ obj.curr +'页', {offset: 'b'});
+                }
+            }
+        });
+
+        //上传
+        upload.render({
+            elem: '#uploadLAY-app-content-list'
+            ,url: '' //上传接口
+            ,done: function(res){
+                //console.log(res)
+            }
+        });
+
+        slider.render({
+            elem: '#sliderLAY-app-content-list'
+            ,input: true //输入框
+        });
+
+
+        /*
+        //底部信息
+        var footerTpl = lay('#footer')[0].innerHTML;
+        lay('#footer').html(layui.laytpl(footerTpl).render({}))
+            .removeClass('layui-hide');
+            */
+
+    });
+
+    //弹出子页回传数据，暂时不用，使用重新载入
+    function GetValue(obj){
+        //alert(obj);
+    }
+</script>
+</body>
+</html>

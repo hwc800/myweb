@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>管理员</title>
+  <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="../static/style/admin.css" media="all">
+  <style>
+    body{margin: 10px;}
+    .LAY-app-content-list-carousel{height: 200px; line-height: 200px; text-align: center;}
+  </style>
+</head>
+<body>
+
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">登录名</label>
+          <div class="layui-input-block">
+            <input type="text" name="loginName" id="loginName" placeholder="请输入" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">手机</label>
+          <div class="layui-input-block">
+            <input type="text" name="phone" id="phone" placeholder="请输入" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">邮箱</label>
+          <div class="layui-input-block">
+            <input type="text" name="email" id="email" placeholder="请输入" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">角色</label>
+          <div class="layui-input-inline">
+            <div class="layui-inline">
+              <select name="roleId" id="roleId" >
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="layui-inline">
+          <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-app-contlist-search" id="searchbtn">
+            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-card-body">
+
+      <table class="layui-hide" id="LAY-app-content-list" lay-filter="test"></table>
+    </div>
+  </div>
+</div>
+
+<script type="text/html" id="barLAY-app-content-list">
+  <!-- <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a> -->
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+   <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script src="../static/layui/layui.js"></script>
+<script>
+    layui.config({
+        version: '1554901097999' //为了更新 js 缓存，可忽略
+        ,base: '../static/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    });
+
+    layui.use(['laydate', 'laypage', 'layer', 'table', 'carousel', 'upload', 'element', 'slider','form'], function(){
+        var $ = layui.$
+            ,laydate = layui.laydate //日期
+            ,laypage = layui.laypage //分页
+            ,layer = layui.layer //弹层
+            ,table = layui.table //表格
+            ,carousel = layui.carousel //轮播
+            ,upload = layui.upload //上传
+            ,element = layui.element //元素操作
+            ,slider = layui.slider //滑块
+            ,form=layui.form //表单
+
+        //向世界问个好
+        // layer.msg('Hello World'); 弹出消息
+
+        //监听Tab切换
+        element.on('tab(LAY-app-content-list)', function(data){
+            layer.tips('切换了 '+ data.index +'：'+ this.innerHTML, this, {
+                tips: 1
+            });
+        });
+
+        $.ajax({
+            type : "POST",
+            url : "/json/admin/get_rolelist.php?limit=5000",//请求路径
+            success : function(data) {
+                var obj =JSON.parse(data);
+                if(data.replace(/\s+/g,"")!=""&&JSON.parse(data)["code"]==-1){
+                    layer.msg(obj["msg"], {
+                        offset: '15px'
+                        ,icon: 1
+                        ,time: 1000
+                    }, function(){
+                        parent.layui.admin.events.closeThisTabs();
+                    });
+                }else {
+                    if (obj["count"] > 0) {
+                        var html = '<option value =0 >全部管理员</option>';
+                        for (var a = 0; a < obj["data"].length; a++) {
+                            var obj2 = obj["data"][a];
+                            html = html + ('<option value = ' + obj2.id + '>' + obj2.roleName + '</option>');
+                        }
+                        $('#roleId').html(html);
+                        form.render('select'); //刷新select选择框渲染
+                    }
+                }
+            }
+        });
+
+
+
+        //执行一个 table 实例
+        table.render({
+            elem: '#LAY-app-content-list'
+            ,height: 530
+            ,url: '/json/admin/get_adminlist.php' //数据接口
+            ,title: '管理员'
+            ,page: true //开启分页
+            ,toolbar: 'default' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+            ,totalRow: false //开启合计行
+            ,cols: [[ //表头
+                {type: 'checkbox', fixed: 'left'}
+                ,{field: 'id', title: 'ID',  sort: true, fixed: 'left', totalRowText: '合计：'}
+                ,{field: 'nickName', title: '昵称'}
+                ,{field: 'loginName', title: '登录名'}
+                ,{field: 'phone', title: '手机'}
+                ,{field: 'email', title: 'eMail'}
+                ,{field: 'roleName', title: '角色'}
+                ,{field: 'createTime', title: '创建时间'}
+                ,{field: 'state', title: '审核状态',templet:function(d){
+                        if(d.state == "1"){
+                            return "已审核";
+                        }else{
+                            return "<span style='color: red;'>待审核</span>";
+                        }
+                    }}
+                ,{fixed: 'right', width: 165, align:'center', toolbar: '#barLAY-app-content-list'}
+            ]]
+        });
+
+        //监听搜索
+        $("#searchbtn").click(function () {
+            var loginName=$("#loginName").val();
+            var phone=$("#phone").val();
+            var email=$("#email").val();
+            var roleId=$("#roleId option:selected").val();
+            table.reload('LAY-app-content-list',{page:true,method:'get',
+                where:{loginName:loginName,phone:phone,email:email,roleId:roleId} });//page:true 分页重置为1
+        });
+
+        //监听头工具栏事件
+        table.on('toolbar(test)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id)
+                ,data = checkStatus.data; //获取选中的数据
+            switch(obj.event){
+                case 'add':
+                    //layer.msg('添加');
+                    layer.open
+                    (
+                        {
+                            type: 2
+                            ,title: '添加管理员'
+                            ,content: 'addadmin.html'
+                            ,maxmin: true
+                            ,area: ['700px', '500px']
+                            ,btn: ['确定', '取消']
+                            ,yes: function(index, layero)
+                            {
+                                //点击确认触发 iframe 内容中的按钮提交
+                                var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-submit");
+                                submit.click();
+                                //parent.close(index); //关闭添加页面;
+                            }
+                        }
+
+                    );
+                    break;
+                case 'update':
+                    if(data.length === 0){
+                        layer.msg('请选择一行');
+                    } else if(data.length > 1){
+                        layer.msg('只能同时编辑一个');
+                    } else {
+                        //layer.alert('编辑 [id]：'+ checkStatus.data[0].id);
+                        layer.open
+                        (
+                            {
+                                type: 2
+                                ,title: '修改管理员'
+                                ,content: 'addadmin.html'
+                                ,maxmin: true
+                                ,area: ['700px', '500px']
+                                ,btn: ['确定', '取消']
+                                ,yes: function(index, layero)
+                                {
+                                    //点击确认触发 iframe 内容中的按钮提交
+                                    var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-edit");
+                                    submit.click();
+                                    //parent.close(index); //关闭添加页面;
+                                },success:function (layero,index) {
+                                    var iframe = window['layui-layer-iframe' + index];
+                                    iframe.child(checkStatus.data[0]);
+                                }
+                            }
+                        );
+                    }
+                    break;
+                case 'delete':
+                    layer.confirm('真的删除行么', function(index) {
+                        if (data.length === 0) {
+                            layer.msg('请选择一行');
+                        } else {
+
+                            var idlist = "0";
+                            for (var a = 0; a < data.length; a++) {
+                                idlist = idlist + "," + data[a].id;
+                            }
+                            //layer.msg('删除');
+                            //批量删除
+                            var postdata = "ids=" + idlist;
+                            $.ajax({
+                                type: 'POST',
+                                url: '/json/admin/del_admin.php',
+                                data: postdata,
+                                success: function (data) {
+                                    if(data.replace(/\s+/g,"")!=""&&JSON.parse(data)["code"]==-1){
+                                        layer.msg(obj["msg"], {
+                                            offset: '15px'
+                                            ,icon: 1
+                                            ,time: 1000
+                                        }, function(){
+                                            parent.layui.admin.events.closeThisTabs();
+                                        });
+                                    }else {
+                                        //执行成功
+                                        alert('删除成功');
+                                        window.location.reload();
+                                        //layer.close(data);
+                                        //obj.del(); //删除对应行（tr）的DOM结构
+                                        //layer.close(data);
+                                    }
+                                },
+                                error: function () {
+                                    layer.msg('删除失败！');
+                                }
+
+                            });
+                        }
+                    });
+
+                    break;
+            };
+        });
+
+        //搜索功能
+
+
+        //监听搜索
+
+
+        // $("#searchbtn").click(function () {
+        //     var keywords=$("#keywords").val();
+        //     var keyType=1;//$("#key_type option:selected").val();
+        //     table.reload('LAY-app-content-list',{page:true,method:'get',
+        //         where:{keywords:keywords,keyType:keyType} });//page:true 分页重置为1
+        // });
+
+        //搜索管理员
+        form.on('select(LAY-user-adminrole-type)', function(data){
+            //执行重载
+            table.reload('LAY-app-content-list', {
+                where: {
+                    roleId: data.value
+                }
+            });
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){ //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+            var data = obj.data //获得当前行数据
+                ,layEvent = obj.event; //获得 lay-event 对应的值
+            if(layEvent === 'detail'){
+                layer.msg('查看操作');
+            } else if(layEvent === 'del'){
+                layer.confirm('真的删除行么', function(index)
+                {
+                    var postdata='id='+data.id;
+                    //向服务端发送删除指令
+                    $.ajax({
+                        type:'POST',
+                        url:'/json/admin/del_admin.php',
+                        data:postdata,
+                        success:function(data1)
+                        {
+                            if(data.replace(/\s+/g,"")!=""&&JSON.parse(data)["code"]==-1){
+                                layer.msg(obj["msg"], {
+                                    offset: '15px'
+                                    ,icon: 1
+                                    ,time: 1000
+                                }, function(){
+                                    parent.layui.admin.events.closeThisTabs();
+                                });
+                            }else {
+                                //执行成功
+                                layer.msg('管理员id:' + data.id + '删除成功');
+                                obj.del(); //删除对应行（tr）的DOM结构
+                                layer.close(index);
+                            }
+                        },
+                        error:function()
+                        {
+                            layer.msg('删除失败！');
+                        }
+                    });
+                });
+            } else if(layEvent === 'edit'){
+                layer.open
+                (
+                    {
+                        type: 2
+                        ,title: '修改管理员'
+                        ,content: 'addadmin.html'
+                        ,maxmin: true
+                        ,area: ['700px', '500px']
+                        ,btn: ['确定', '取消']
+                        ,yes: function(index, layero)
+                        {
+                            //点击确认触发 iframe 内容中的按钮提交
+                            var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-edit");
+                            submit.click();
+                            //parent.close(index); //关闭添加页面;
+                        },success:function (layero,index) {
+                            var iframe = window['layui-layer-iframe' + index];
+                            iframe.child(data);
+                        }
+                    }
+                );
+                //layer.msg('编辑操作');
+            }
+        });
+ 
+        //分页
+        laypage.render({
+            elem: 'pageLAY-app-content-list' //分页容器的id
+            ,count: 100 //总页数
+            ,skin: '#1E9FFF' //自定义选中色值
+            //,skip: true //开启跳页
+            ,jump: function(obj, first){
+                if(!first){
+                    layer.msg('第'+ obj.curr +'页', {offset: 'b'});
+                }
+            }
+        });
+
+        //上传
+        upload.render({
+            elem: '#uploadLAY-app-content-list'
+            ,url: '' //上传接口
+            ,done: function(res){
+                //console.log(res)
+            }
+        });
+
+        slider.render({
+            elem: '#sliderLAY-app-content-list'
+            ,input: true //输入框
+        });
+
+
+        /*
+        //底部信息
+        var footerTpl = lay('#footer')[0].innerHTML;
+        lay('#footer').html(layui.laytpl(footerTpl).render({}))
+            .removeClass('layui-hide');
+            */
+
+    });
+
+    //弹出子页回传数据，暂时不用，使用重新载入
+    function GetValue(obj){
+        //alert(obj);
+    }
+</script>
+</body>
+</html>
