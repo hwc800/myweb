@@ -4,12 +4,14 @@ from app01 import views
 
 urlpatterns = [
     url(r'^main', views.main, name='main'),
+    url(r'^index', views.index, name='index'),
     url(r'^user_reg', views.user_reg, name='user_reg'),
     url(r'^user_login', views.user_login, name='user_login'),
     url(r'^user_forget', views.user_forget, name='user_forget'),
     url(r'^home', views.home_console, name='home'),
     url(r'^c1', views.console_one, name='c1'),
     url(r'^c2', views.console_two, name='c2'),
+    url(r'^dibu', views.dibu, name='dibu'),
     url(r'^gdl', views.grid_list, name='gdl'),
     url(r'^gmobile', views.grid_mobile, name='gmobile'),
     url(r'^gmpc', views.grid_mobile_pc, name='gmpc'),

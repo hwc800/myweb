@@ -7,9 +7,19 @@ def main(requests):
         return render(requests, "index.html")
 
 
+def index(requests):
+    if requests.method == 'GET':
+        return render(requests, "main.html")
+
+
 def home_console(requests):
     if requests.method == 'GET':
         return render(requests, "home/console.html")
+
+
+def dibu(requests):
+    if requests.method == 'GET':
+        return render(requests, "index/dibu.html")
 
 
 def console_one(requests):

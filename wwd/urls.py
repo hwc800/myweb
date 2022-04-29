@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
+from app01 import views as vie
 
 import app01.urls
 
@@ -23,4 +24,5 @@ import app01.urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'', include((app01.urls, 'index'), namespace='index')),
+    url(r'^', vie.index),
 ]
