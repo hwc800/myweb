@@ -7,6 +7,11 @@ def main(requests):
         return render(requests, "index.html")
 
 
+def box(requests):
+    if requests.method == 'GET':
+        return render(requests, "mytemplates/box_index.html")
+
+
 def index(requests):
     if requests.method == 'GET':
         return render(requests, "main.html")

@@ -3,13 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link href="http://127.0.0.1:8000/static/box_static/base.css?v=1.8" rel="stylesheet" type="text/css">
+<link href="http://127.0.0.1:8000/static/box_static/index.css?v=1.5" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="http://127.0.0.1:8000/static/box_static/jquery.classyleaves.min.css">
 </head>
 <body>
 <div style="">
     <div>
-        <p>版权所有:hwc&nbsp&nbsp&nbsp&nbsp<img src="static/police/guohui.png"><a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank">湘ICP备2022007684号</a>&nbsp&nbsp&nbsp&nbsp联系方式：429135313@qq.com</p>
-
+        <p>版权所有:hwc&nbsp&nbsp&nbsp&nbsp<img src="static/police/guohui.png"><a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank">湘ICP备2022007684号</a>&nbsp&nbsp&nbsp&nbsp邮箱：429135313@qq.com</p>
     </div>
+    <div class="banner">
+              <!--Luara图片切换骨架begin-->
+              <div class="photo-slide" style="width: 500px; height: 280px;">
+                  <ul style="width: 500px; height: 280px; top: 0px;">
+                      <li style="width: 500px; height: 280px;">
+                          <a href="https://www.boygirs.com/detail/6.html" title="关于博客">
+                              <img src="http://127.0.0.1:8000/static/box_static/li.jpg" alt="关于博客" style="width: 500px;height: 280px;">
+                          </a>
+                      </li>
+                      <li style="width: 500px; height: 280px;">
+                          <a href="https://www.boygirs.com/detail/121.html" title="关于友情链接">
+                              <img src="http://127.0.0.1:8000/static/ico/msdt2.jpg" alt="关于友情链接" style="width: 500px;height: 280px;">
+                          </a>
+                      </li>
+                      <li style="width: 500px; height: 280px;">
+                          <a href="https://www.boygirs.com/book/index" title="关于书屋">
+                              <img src="http://127.0.0.1:8000/static/ico/msdt1.jpg" alt="关于书屋" style="width: 500px;height: 280px;">
+                          </a>
+                      </li>
+                      <li style="width: 500px; height: 280px;">
+                          <a href="https://www.boygirs.com/detail/5.html" title="关于博主">
+                              <img src="http://127.0.0.1:8000/static/ico/msdt2.jpg" alt="关于博主" style="width: 500px;height: 280px;">
+                          </a>
+                      </li>
+                  </ul>
+                  <ol>
+                      <li class="seleted"></li>
+                      <li class=""></li>
+                      <li class=""></li>
+                      <li class=""></li>
+                  </ol>
+              </div>
 </div>
+</div>
+  <script type="text/javascript">
+      $(function(){
+          <!--调用Luara示例-->
+          $(".photo-slide").luara({width:"500",height:"280",interval:5000,selected:"seleted",deriction:"top"});
+
+      });
+  </script>
 </body>
 </html>
