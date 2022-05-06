@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>明水洞天</title>
-<link rel="shortcut icon" href="static/ico/qyz.jpg">
+<link rel="shortcut icon" href="static/ico/qyz.png">
 
 <meta itemprop="image" content="static/">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -263,48 +263,13 @@
   <script type="text/javascript" src="http://www.boygirs.com/static/box_static/top.js"></script>
   <script type="text/javascript" src="http://www.boygirs.com/static/box_static/jquery.lazyload.js">></script>
 
-  <!--<script src="static//static/box_static/jquery.rotate.js"></script>
-  <script src="static//static/box_static/jquery.classyleaves.min.js?t=2"></script>-->
 
-  <!--<script src="https://www.boygirs.com/index/mergeinfojs/type/3"></script>-->
-
-<!--  <script type="text/javascript">-->
-<!--      $(document).ready(function() {-->
-<!--              if(document.domain != '127.0.0.1:8000' &&document.domain !='127.0.0.1:8000'){window.location.href='http://www.boygirs.com';}-->
-<!--             /* var tree = new ClassyLeaves({-->
-<!--                  leaves: 30,-->
-<!--                  maxY: -10,-->
-<!--                  multiplyOnClick: true,-->
-<!--                  multiply: 2,-->
-<!--                  infinite: true,-->
-<!--                  speed: 4000-->
-<!--              });-->
-<!--              $('body').on('click', '.addLeaf', function() {-->
-<!--                  tree.add(8);-->
-<!--                  return false;-->
-<!--              });*/-->
-
-<!--          $("img").lazyload({-->
-<!--              placeholder : "http://www.boygirs.com/static/box_static/li.jpg",-->
-<!--              effect      : "show"//show(直接显示),fadeIn(淡入),slideDown(下拉)-->
-<!--          });-->
-<!--      });-->
-
-<!--      // $(window).load(function(){-->
-<!--      //     $('.cy_cmt_count').prepend('评论（').append(' )');-->
-<!--      // });-->
-
-<!--     var date = new Date();-->
-<!--     var dateYear = date.getFullYear();-->
-<!--     $("#DateYear").html(dateYear);-->
-<!--  </script>-->
-<!--  &lt;!&ndash;结束 &ndash;&gt;-->
   <script type="text/javascript">
       function search() {
           var q = $('input[name=q]').val();
           var iq = $.trim(q);
           if(iq == '') return false;
-          var url = "http://search.127.0.0.1:8000/index.php?q=" + q + "&m=&f=_all&s=&p=1";
+          var url = "http://search.boygirs.com/index.php?q=" + q + "&m=&f=_all&s=&p=1";
           console.log(url);
           window.location.href = url;
       }
