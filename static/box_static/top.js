@@ -48,7 +48,7 @@ function changecode(){
 }
 
 $(document).ready(function(){
-    if(document.domain != 'yezismile.com' &&document.domain !='www.yezismile.com'){window.location.href='https://www.yezismile.com/';}
+    if(document.domain != '127.0.0.1' &&document.domain !='127.0.0.1'){window.location.href='https://127.0.0.1/';}
 	/*返回顶部*/
     $("#gotop").click(function(e){
 		$('body,html').animate({scrollTop:0},1000);
