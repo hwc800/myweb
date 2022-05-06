@@ -26,7 +26,6 @@ SECRET_KEY = 'iv9gjeqs^x3+nr9lgsn&a-jq316rnbrjvqj96or-zuj#ub=#!)'
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-SECURE_SSL_REDIRECT = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app01',
-    "sslserver",
 ]
 
 MIDDLEWARE = [
