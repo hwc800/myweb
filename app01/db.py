@@ -95,7 +95,6 @@ class Table(object):
         value = ','.join(values)
         cursor = self.db.cursor()
         sql = f"insert into {self.table}({key}) value ({value});"
-        # print("[SQL-sentence]:", sql)
         try:
             cursor.execute(sql)
         except:
@@ -139,7 +138,6 @@ class Table(object):
     def select(self, arr):
         sql = isql(arr)
         sql = f"select * from {self.table} where {sql};"
-        print("[SQL-sentence]:", sql)
         fi = self.filename
         fields = []
         # 得到所有的字段名
@@ -160,7 +158,6 @@ class Table(object):
         """返回全部的查询结果，每一条记录都是一个字典，装在一个列表中"""
         sql = isql(arr)
         sql = f"select * from {self.table} where {sql};"
-        print("[SQL-sentence]:", sql)
         fi = self.filename
         fields = []
         result = []
@@ -179,7 +176,6 @@ class Table(object):
         return result
 
     def auto_select(self, sql):
-        print("[SQL-sentence]:", sql)
         cursor = self.db.cursor()
         cursor.execute(sql)
         result = cursor.fetchall()
@@ -228,7 +224,6 @@ class Table(object):
                 where_file_and_value += " and "
 
         sql = "UPDATE %s SET %s where %s;" % (self.table, files_and_value, where_file_and_value)
-        print("[SQL-sentence]:", sql)
         cursor = self.db.cursor()
         cursor.execute(sql)
 
