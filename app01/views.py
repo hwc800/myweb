@@ -1,15 +1,30 @@
 from django.shortcuts import render
+from app01 import db
 
 
 # Create your views here.
 def main(requests):
     if requests.method == 'GET':
-        return render(requests, "index.html")
+        result = db.article_title(10000)
+        page = 0
+        data = {}
+        for app in result:
+            data[page] = app
+            page += 1
+        content ={
+            "data": data
+        }
+        return render(requests, "index.html", content)
 
 
 def box(requests):
     if requests.method == 'GET':
         return render(requests, "mytemplates/box_index.html")
+
+
+def thirst(requests):
+    if requests.method == 'GET':
+        return render(requests, "page/thirst.html")
 
 
 def index(requests):
