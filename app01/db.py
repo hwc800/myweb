@@ -344,7 +344,7 @@ def article_title(id):
 #
 # f = str(datetime.datetime.now())
 # print(f[:19])
-g = article_title(10000)
-print(g)
+# g = article_title(10000)
+# print(g)
 
 
