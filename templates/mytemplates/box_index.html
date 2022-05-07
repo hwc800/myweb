@@ -157,15 +157,13 @@
               </h2>
               <div class="blogs">
                   {% for key,value in data.items %}
-                  <p>{{ value.article_title }}</p>
-                  <p>{{ key }}</p>
                   <figure>
                       <a href="#" title="{{ value.article_title }}" target="_blank">
                       <img src="static/ico/msdt1.jpg" original="static/ico/msdt1.jpg" style="width: 167.5px; height: 137px; display: block;" alt="虚位以待">
                       </a>
                   </figure>
                   <ul>
-                      <h3><a href="https://www.boygirs.com/detail/502.html" title="{{ value.article_title }}" target="_blank">{{ value.article_title }}</a></h3>
+                      <h3><a href="{{ value.article_link }}" title="{{ value.article_title }}" target="_blank">{{ value.article_title }}</a></h3>
                       <p>
                           {{ value.article_introduce }}
                           <a href="{{ value.article_link }}" target="_blank" style="color: #759b08;padding-left:5px;">[详情]</a>
