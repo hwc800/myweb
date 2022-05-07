@@ -5,16 +5,8 @@ from app01 import db
 # Create your views here.
 def main(requests):
     if requests.method == 'GET':
-        result = db.article_title(10000)
-        page = 0
-        data = {}
-        for app in result:
-            data[page] = app
-            page += 1
-        content ={
-            "data": data
-        }
-        return render(requests, "index.html", content)
+
+        return render(requests, "index.html")
 
 
 def box(requests):
@@ -24,7 +16,16 @@ def box(requests):
 
 def thirst(requests):
     if requests.method == 'GET':
-        return render(requests, "page/thirst.html")
+        result = db.article_title(10000)
+        page = 0
+        data = {}
+        for app in result:
+            data[page] = app
+            page += 1
+        content ={
+            "data": data
+        }
+        return render(requests, "page/thirst.html", content)
 
 
 def index(requests):

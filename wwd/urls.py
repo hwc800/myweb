@@ -25,5 +25,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'', include((app01.urls, 'index'), namespace='index')),
     url(r'box', vie.box),
-    # url(r'^', vie.box),
+    url(r'^', vie.box),
 ]
