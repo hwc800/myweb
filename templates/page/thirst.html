@@ -463,207 +463,207 @@
 </div>
 
 
-<div id="threeWeixin2" style="height: 100%; width: 100%; left: 0px; top: 0px; bottom: 0px; position: fixed; background: rgba(0, 0, 0, 0.5); display: none;">
-    <div class="hide-center" id="hide-center2">
-        <div id="formhead2">
+<!--<div id="threeWeixin2" style="height: 100%; width: 100%; left: 0px; top: 0px; bottom: 0px; position: fixed; background: rgba(0, 0, 0, 0.5); display: none;">-->
+<!--    <div class="hide-center" id="hide-center2">-->
+<!--        <div id="formhead2">-->
 <!--            <div id="formhead-title2">-->
 <!--                <span style=" float:left; font-size:18px; margin-left:55px; margin-top:5px;">微信扫码登录</span>-->
 <!--                <span style=" float:left; clear:both; color:#999999; font-weight:normal; font-size:12px;margin-left:32px; margin-top:10px;">首次需关注公众号 |</span><a style="color:#999999; float:left; margin-left:5px; font-size:12px; font-weight:normal; margin-top:10px;" href="/user/login.aspx?from=http://so.gushiwen.cn/shiwenv.aspx?id=4c5705b99143">账号登录</a>-->
 <!--            </div>-->
-            <button type="button" id="close2">X</button>
-        </div>
-        <div id="formbody2">
-            <img id="erweimaCanshu2" width="200" height="200" src="https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQE_7zwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyWUxXZlJDbGVkN2kxSVRidGh5MWgAAgQ3PnZiAwQAjScA" alt="">
-        </div>
-    </div>
-</div>
+<!--            <button type="button" id="close2">X</button>-->
+<!--        </div>-->
+<!--        <div id="formbody2">-->
+<!--            <img id="erweimaCanshu2" width="200" height="200" src="https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQE_7zwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyWUxXZlJDbGVkN2kxSVRidGh5MWgAAgQ3PnZiAwQAjScA" alt="">-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 
 
-<script type="text/javascript">
-    //取得cookie值
-    function getCookie(name) {
-        var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+<!--<script type="text/javascript">-->
+<!--    //取得cookie值-->
+<!--    function getCookie(name) {-->
+<!--        var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");-->
 
-        if (arr = document.cookie.match(reg))
+<!--        if (arr = document.cookie.match(reg))-->
 
-            return unescape(arr[2]);
-        else
-            return null;
-    }
+<!--            return unescape(arr[2]);-->
+<!--        else-->
+<!--            return null;-->
+<!--    }-->
 
-    $("#close").click(function () {
-        $("#threeWeixin").fadeOut("slow");
-        clearInterval(intervalErweima);
-        intervalErweima2 = null;
-    })
+<!--    $("#close").click(function () {-->
+<!--        $("#threeWeixin").fadeOut("slow");-->
+<!--        clearInterval(intervalErweima);-->
+<!--        intervalErweima2 = null;-->
+<!--    })-->
 
-    $("#close2").click(function () {
-        $("#threeWeixin2").fadeOut("slow");
-        clearInterval(intervalErweima2);
-        intervalErweima2 = null;
-    })
-    var timesRun = 0;
-    var scene_id = Math.floor((Math.random() * 9999999) + 200000000);
+<!--    $("#close2").click(function () {-->
+<!--        $("#threeWeixin2").fadeOut("slow");-->
+<!--        clearInterval(intervalErweima2);-->
+<!--        intervalErweima2 = null;-->
+<!--    })-->
+<!--    var timesRun = 0;-->
+<!--    var scene_id = Math.floor((Math.random() * 9999999) + 200000000);-->
 
-    //判断是否为登录用户但未关注公众号
-    var wxopenid = getCookie('wxopenid');
-    var gsw2017user = getCookie('gsw2017user');
-    var threeWeixinID = document.getElementById('threeWeixin');
-    var threeWeixin2ID = document.getElementById('threeWeixin2');
-    var erweimaShow = 0;
-    var intervalErweima = null;
-    var intervalErweima2 = null;
-    //wxopenid为空必然未提醒，提醒后1周内不再提醒。如果账号能保存，那么wxopenid必然能保存
-
-
-    $("#html").click(function () {
-        //仅改变定位
-        if (threeWeixinID.style.display != 'none') {
-            return;
-        }
-        else if (threeWeixin2ID.style.display != 'none') {
-            return;
-        }
-        setTimeout(showErweima, 1000);
-    })
-
-    function showErweima() {
-        if (document.hidden) {
-            return;
-        }
-
-        if (gsw2017user != null && getCookie('login') != null && wxopenid == null && erweimaShow == 0) {
-
-            //获取二维码
-            var xmlhttp;
-            if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
-                xmlhttp = new XMLHttpRequest();
-            }
-            else {// code for IE6, IE5
-                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-            }
-            xmlhttp.onreadystatechange = function () {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    document.getElementById('erweimaCanshu').src = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + xmlhttp.responseText;
-                }
-            }
-            xmlhttp.open("GET", "/getTicket.aspx?scene_id=" + scene_id, false);
-            xmlhttp.send();
-
-            $("#threeWeixin").fadeIn("slow");
-            timesRun = 0;
-
-            //判断码是否被扫
-            intervalErweima = setInterval("selectErweima()", "2000");
-
-        }
-        else if (gsw2017user == null && getCookie('login') != null && erweimaShow == 0) {
-
-            //获取二维码
-            if (getCookie('ticketStr') != null && getCookie('ticketStr').indexOf("|") > 0) {
-                var ticketStr = getCookie('ticketStr').split('|');
-                scene_id = ticketStr[0];
-                document.getElementById('erweimaCanshu2').src = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + ticketStr[1];
-            }
-            else {
-                var xmlhttp;
-                if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
-                    xmlhttp = new XMLHttpRequest();
-                }
-                else {// code for IE6, IE5
-                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-                }
-                xmlhttp.onreadystatechange = function () {
-                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                        document.getElementById('erweimaCanshu2').src = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + xmlhttp.responseText;
-                    }
-                }
-                xmlhttp.open("GET", "/getTicket.aspx?scene_id=" + scene_id, false);
-                xmlhttp.send();
-            }
-
-            $("#threeWeixin2").fadeIn("slow");
-            timesRun = 0;
-
-            //判断码是否被扫
-            intervalErweima2 = setInterval("selectErweima2()", "2000");
-
-        }
-    }
+<!--    //判断是否为登录用户但未关注公众号-->
+<!--    var wxopenid = getCookie('wxopenid');-->
+<!--    var gsw2017user = getCookie('gsw2017user');-->
+<!--    var threeWeixinID = document.getElementById('threeWeixin');-->
+<!--    var threeWeixin2ID = document.getElementById('threeWeixin2');-->
+<!--    var erweimaShow = 0;-->
+<!--    var intervalErweima = null;-->
+<!--    var intervalErweima2 = null;-->
+<!--    //wxopenid为空必然未提醒，提醒后1周内不再提醒。如果账号能保存，那么wxopenid必然能保存-->
 
 
+<!--    $("#html").click(function () {-->
+<!--        //仅改变定位-->
+<!--        if (threeWeixinID.style.display != 'none') {-->
+<!--            return;-->
+<!--        }-->
+<!--        else if (threeWeixin2ID.style.display != 'none') {-->
+<!--            return;-->
+<!--        }-->
+<!--        setTimeout(showErweima, 1000);-->
+<!--    })-->
 
-    //判断码是否被扫
-    function selectErweima2() {
-        //60秒后停止
-        timesRun = timesRun + 1;
-        if (timesRun > 60) {
-            $("#threeWeixin2").fadeOut("slow");
+<!--    function showErweima() {-->
+<!--        if (document.hidden) {-->
+<!--            return;-->
+<!--        }-->
 
-            clearInterval(intervalErweima2);
-            intervalErweima2 = null;
-        }
+<!--        if (gsw2017user != null && getCookie('login') != null && wxopenid == null && erweimaShow == 0) {-->
 
-        var xmlhttp;
-        if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
-            xmlhttp = new XMLHttpRequest();
-        }
-        else {// code for IE6, IE5
-            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        xmlhttp.onreadystatechange = function () {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                if (xmlhttp.responseText == "1") {
-                    $("#threeWeixin2").fadeOut("slow");
-                    erweimaShow = 1;
-                    clearInterval(intervalErweima2);
-                    intervalErweima2 = null;
-                }
-            }
-        }
-        xmlhttp.open("POST", "/user/getEventLogin.aspx?&scene_id=" + scene_id, false);
-        xmlhttp.send();
+<!--            //获取二维码-->
+<!--            var xmlhttp;-->
+<!--            if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari-->
+<!--                xmlhttp = new XMLHttpRequest();-->
+<!--            }-->
+<!--            else {// code for IE6, IE5-->
+<!--                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");-->
+<!--            }-->
+<!--            xmlhttp.onreadystatechange = function () {-->
+<!--                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {-->
+<!--                    document.getElementById('erweimaCanshu').src = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + xmlhttp.responseText;-->
+<!--                }-->
+<!--            }-->
+<!--            xmlhttp.open("GET", "/getTicket.aspx?scene_id=" + scene_id, false);-->
+<!--            xmlhttp.send();-->
 
-    }
+<!--            $("#threeWeixin").fadeIn("slow");-->
+<!--            timesRun = 0;-->
 
-    function selectErweima() {
-        //60秒后停止
-        timesRun = timesRun + 1;
-        if (timesRun > 60) {
-            $("#threeWeixin").fadeOut("slow");
-            clearInterval(intervalErweima);
-            intervalErweima = null;
-        }
+<!--            //判断码是否被扫-->
+<!--            intervalErweima = setInterval("selectErweima()", "2000");-->
 
-        var xmlhttp;
-        if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
-            xmlhttp = new XMLHttpRequest();
-        }
-        else {// code for IE6, IE5
-            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        xmlhttp.onreadystatechange = function () {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                if (xmlhttp.responseText != "未扫码") {
+<!--        }-->
+<!--        else if (gsw2017user == null && getCookie('login') != null && erweimaShow == 0) {-->
 
-                    $("#threeWeixin").fadeOut("slow");
-                    erweimaShow = 1;
-                    clearInterval(intervalErweima);
-                    intervalErweima = null;
-                }
-            }
-        }
-        xmlhttp.open("POST", "/getEventKey.aspx?&scene_id=" + scene_id, false);
-        xmlhttp.send();
-    }
+<!--            //获取二维码-->
+<!--            if (getCookie('ticketStr') != null && getCookie('ticketStr').indexOf("|") > 0) {-->
+<!--                var ticketStr = getCookie('ticketStr').split('|');-->
+<!--                scene_id = ticketStr[0];-->
+<!--                document.getElementById('erweimaCanshu2').src = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + ticketStr[1];-->
+<!--            }-->
+<!--            else {-->
+<!--                var xmlhttp;-->
+<!--                if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari-->
+<!--                    xmlhttp = new XMLHttpRequest();-->
+<!--                }-->
+<!--                else {// code for IE6, IE5-->
+<!--                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");-->
+<!--                }-->
+<!--                xmlhttp.onreadystatechange = function () {-->
+<!--                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {-->
+<!--                        document.getElementById('erweimaCanshu2').src = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + xmlhttp.responseText;-->
+<!--                    }-->
+<!--                }-->
+<!--                xmlhttp.open("GET", "/getTicket.aspx?scene_id=" + scene_id, false);-->
+<!--                xmlhttp.send();-->
+<!--            }-->
 
-</script>
-    </div>
-    <div class="right">
-        <div class="abcd">
+<!--            $("#threeWeixin2").fadeIn("slow");-->
+<!--            timesRun = 0;-->
 
-        </div>
-    </div>
+<!--            //判断码是否被扫-->
+<!--            intervalErweima2 = setInterval("selectErweima2()", "2000");-->
+
+<!--        }-->
+<!--    }-->
+
+
+
+<!--    //判断码是否被扫-->
+<!--    function selectErweima2() {-->
+<!--        //60秒后停止-->
+<!--        timesRun = timesRun + 1;-->
+<!--        if (timesRun > 60) {-->
+<!--            $("#threeWeixin2").fadeOut("slow");-->
+
+<!--            clearInterval(intervalErweima2);-->
+<!--            intervalErweima2 = null;-->
+<!--        }-->
+
+<!--        var xmlhttp;-->
+<!--        if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari-->
+<!--            xmlhttp = new XMLHttpRequest();-->
+<!--        }-->
+<!--        else {// code for IE6, IE5-->
+<!--            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");-->
+<!--        }-->
+<!--        xmlhttp.onreadystatechange = function () {-->
+<!--            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {-->
+<!--                if (xmlhttp.responseText == "1") {-->
+<!--                    $("#threeWeixin2").fadeOut("slow");-->
+<!--                    erweimaShow = 1;-->
+<!--                    clearInterval(intervalErweima2);-->
+<!--                    intervalErweima2 = null;-->
+<!--                }-->
+<!--            }-->
+<!--        }-->
+<!--        xmlhttp.open("POST", "/user/getEventLogin.aspx?&scene_id=" + scene_id, false);-->
+<!--        xmlhttp.send();-->
+
+<!--    }-->
+
+<!--    function selectErweima() {-->
+<!--        //60秒后停止-->
+<!--        timesRun = timesRun + 1;-->
+<!--        if (timesRun > 60) {-->
+<!--            $("#threeWeixin").fadeOut("slow");-->
+<!--            clearInterval(intervalErweima);-->
+<!--            intervalErweima = null;-->
+<!--        }-->
+
+<!--        var xmlhttp;-->
+<!--        if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari-->
+<!--            xmlhttp = new XMLHttpRequest();-->
+<!--        }-->
+<!--        else {// code for IE6, IE5-->
+<!--            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");-->
+<!--        }-->
+<!--        xmlhttp.onreadystatechange = function () {-->
+<!--            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {-->
+<!--                if (xmlhttp.responseText != "未扫码") {-->
+
+<!--                    $("#threeWeixin").fadeOut("slow");-->
+<!--                    erweimaShow = 1;-->
+<!--                    clearInterval(intervalErweima);-->
+<!--                    intervalErweima = null;-->
+<!--                }-->
+<!--            }-->
+<!--        }-->
+<!--        xmlhttp.open("POST", "/getEventKey.aspx?&scene_id=" + scene_id, false);-->
+<!--        xmlhttp.send();-->
+<!--    }-->
+
+<!--</script>-->
+<!--    </div>-->
+<!--    <div class="right">-->
+<!--        <div class="abcd">-->
+
+<!--        </div>-->
+<!--    </div>-->
 
 
 <div class="main4">

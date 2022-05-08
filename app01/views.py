@@ -9,6 +9,13 @@ def main(requests):
         return render(requests, "index.html")
 
 
+def mode(requests):
+    if requests.method == 'GET':
+
+        return render(requests, "page/mode.html")
+
+
+
 def box(requests):
     if requests.method == 'GET':
         result = db.article_title(10000)
