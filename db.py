@@ -95,6 +95,7 @@ class Table(object):
         value = ','.join(values)
         cursor = self.db.cursor()
         sql = f"insert into {self.table}({key}) value ({value});"
+        print(sql)
         try:
             cursor.execute(sql)
         except:
@@ -337,10 +338,10 @@ def article_title(id):
     return result
 
 
-def insert(**kwargs):
+def insert(tble, **kwargs):
     db = MySql(config_db.HOST, config_db.USER, config_db.PWD, config_db.DATABASE)
     # 操作表类
-    table = db.usetable(config_db.markdown_content, config_db.DATABASE)
+    table = db.usetable(tble, config_db.DATABASE)
     table.insert(**kwargs)
     db.close()
     return True

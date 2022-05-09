@@ -1,5 +1,6 @@
 from django.shortcuts import render
 import db
+import wwd.config_db as config_db
 
 
 # Create your views here.
@@ -10,8 +11,9 @@ def root_login(requests):
 
 def box_mode(requests):
     if requests.method == 'GET':
-
-        return render(requests, "page/mode.html")
+        rep = render(requests, "page/mode.html")
+        rep.set_cookie("user_id", 1000)
+        return rep
 
 
 def box_index(requests):
@@ -26,7 +28,7 @@ def box_index(requests):
             "data": data
         }
         rep = render(requests, "mytemplates/box_index.html")
-        rep.set_cookie("user_id", 10000)
+        rep.set_cookie("user_id", 10001)
 
         return render(requests, "mytemplates/box_index.html", content)
 
@@ -39,12 +41,12 @@ def box_content(requests):
         article_introduce = requests.POST.get("article_introduce")
         # 插入content
         g = requests.POST.get("content")
-        content_id = time.time()
+        content_id = str(time.time())
         content_date = str(datetime.datetime.now())[:19]
         content = g
-        db.insert(user_id=user_id, content=content, content_data=content_date, content_id=content_id)
+        db.insert(config_db.markdown_content, user_id=user_id, content=content, content_data=content_date, content_id=content_id)
         data = {"content": g}
         # 插入导航表
-        db.insert(user_id=user_id, article_title=content_title, article_introduce=article_introduce, date=content_date)
+        db.insert(config_db.user_data, user_id=user_id, article_title=content_title, article_introduce=article_introduce, date=content_date)
 
         return render(requests, "page/show_mode.html", data)
