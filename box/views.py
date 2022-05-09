@@ -25,18 +25,26 @@ def box_index(requests):
         content = {
             "data": data
         }
+        rep = render(requests, "mytemplates/box_index.html")
+        rep.set_cookie("user_id", 10000)
+
         return render(requests, "mytemplates/box_index.html", content)
 
 
 def box_content(requests):
-    import datetime
+    import datetime, time
     if requests.method == 'POST':
-
+        user_id = requests.COOKIES.get("user_id")
+        content_title = requests.POST.get("content_title")
+        article_introduce = requests.POST.get("article_introduce")
+        # 插入content
         g = requests.POST.get("content")
-        user_id = 10000
+        content_id = time.time()
         content_date = str(datetime.datetime.now())[:19]
         content = g
-        db.insert(user_id=user_id, content=content, content_data=content_date)
+        db.insert(user_id=user_id, content=content, content_data=content_date, content_id=content_id)
         data = {"content": g}
-        print(111)
+        # 插入导航表
+        db.insert(user_id=user_id, article_title=content_title, article_introduce=article_introduce, date=content_date)
+
         return render(requests, "page/show_mode.html", data)
