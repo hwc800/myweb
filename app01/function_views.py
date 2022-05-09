@@ -1,8 +1,7 @@
 from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse
 
 # Create your views here.
-from app01 import db
+import db
 
 
 def index_select_data(requests):

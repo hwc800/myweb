@@ -74,4 +74,17 @@ user_data_article_title = "article_title"
 user_data_article_introduce = "article_introduce"
 user_data_article_link = "article_link"
 user_data_date = "date"
+"""
+markdown_content = {
+    "user_id": "int(10)",
+    "content": "text",
+    "content_data": "text",
+}
+"""
+# 保存文章内容的表
+markdown_content = "markdown_content"
+markdown_content_user_id = "user_id"
+markdown_content_content = "content"
+markdown_content_content_data = "content_data"
+
 

@@ -337,7 +337,13 @@ def article_title(id):
     return result
 
 
-
+def insert(**kwargs):
+    db = MySql(config_db.HOST, config_db.USER, config_db.PWD, config_db.DATABASE)
+    # 操作表类
+    table = db.usetable(config_db.markdown_content, config_db.DATABASE)
+    table.insert(**kwargs)
+    db.close()
+    return True
 # c = select_user_comment("http://www.boygirs/thirst")
 # print(c)
 # import datetime

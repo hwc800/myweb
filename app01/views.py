@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from app01 import db
+import db
 
 
 # Create your views here.
@@ -7,27 +7,6 @@ def main(requests):
     if requests.method == 'GET':
 
         return render(requests, "index.html")
-
-
-def mode(requests):
-    if requests.method == 'GET':
-
-        return render(requests, "page/mode.html")
-
-
-
-def box(requests):
-    if requests.method == 'GET':
-        result = db.article_title(10000)
-        page = 0
-        data = {}
-        for app in result:
-            data[page] = app
-            page += 1
-        content = {
-            "data": data
-        }
-        return render(requests, "mytemplates/box_index.html", content)
 
 
 def thirst(requests):

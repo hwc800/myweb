@@ -78,29 +78,10 @@
 			}
 		</style>
 	</head>
-	<script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-			<script>
-		jQuery.noConflict();
-		// 使用 jQuery
-		jQuery("div p").hide();
 
-			function saved_to_server(content){
-				jQuery.ajax({
-					type:"post",
-					url:"/box_content",
-					dataType:"json",
-					traditional:true,
-					headers:{'X-CSRFToken':'{{ csrf_token }}'},
-					data:{"content": content},
-					success:function(data){
-						if(data=1){alert("成功");}
-					}
-				})
-				}
-		</script>
 	<body>
 		<center>
-			<h1><input type="text" value="请填写标题"></h1>
+			<h1>MarkDown Edit</h1>
 			<button onclick="saved();style.display='none';" id="saved">保存</button>
 			<button onclick="edit();style.display='none';" id="edit" style="display:none;">编辑</button>
 		</center>
@@ -136,9 +117,6 @@
 				document.getElementById("printNum").style.display="none";
 				document.getElementById("edit").style.display="inline";
 				document.getElementById("ShowPage").style.margin="0 0 0 30%";
-				var content = document.getElementById("text-input").value;
-				saved_to_server(content);
-
 				};
 			function edit(){
 				document.getElementById("printNum").style.display="inline";
@@ -146,4 +124,5 @@
 			};
 		</script>
 	</body>
+
 </html>

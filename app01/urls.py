@@ -4,8 +4,6 @@ from app01 import views, function_views as fv
 
 urlpatterns = [
     url(r'^main', views.main, name='main'),
-    url(r'^thirst', views.thirst, name='thirst'),
-    url(r'^mode', views.mode, name='mode'),
     url(r'^index', views.index, name='index'),
     url(r'^user_reg', views.user_reg, name='user_reg'),
     url(r'^user_login', views.user_login, name='user_login'),
