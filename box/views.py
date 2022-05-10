@@ -52,7 +52,14 @@ def box_content(requests):
         return render(requests, "page/show_mode.html", data)
 
 
-# def box_show_mode(requests):
-#     if requests.method == "GET":
-#         requests.
-#         return render(requests, "page/show_mode.html", data)
+def box_show_mode(requests):
+    if requests.method == "GET":
+        article_id = requests.GET.get("article_id")
+        result = db.select_markdown_content(article_id)
+        if not result:
+            return
+        content = result[0]["content"]
+        data = {
+            "content": content
+        }
+        return render(requests, "page/show_mode.html", data)

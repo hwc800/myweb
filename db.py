@@ -345,6 +345,18 @@ def insert(tble, **kwargs):
     table.insert(**kwargs)
     db.close()
     return True
+
+
+def select_markdown_content(article_id):
+    """查询文章简介表"""
+    files = ["user_id", "content", "content_date"]
+    sql = "select user_id, content, content_date from %s wherer article_id=%s;" % (config_db.user_data, article_id)
+    db = MySql(config_db.HOST, config_db.USER, config_db.PWD, config_db.DATABASE)
+    # 操作表类
+    table = db.usetable(config_db.markdown_content, config_db.DATABASE)
+    g = table.auto_select(sql)
+    result = db_dict(files, g)
+    return result
 # c = select_user_comment("http://www.boygirs/thirst")
 # print(c)
 # import datetime
