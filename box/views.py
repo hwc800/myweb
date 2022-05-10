@@ -45,6 +45,7 @@ def box_content(requests):
         content_id = str(time.time())
         content_date = str(datetime.datetime.now())[:19]
         content = g
+        content = content.replace("\"", "\'")
         db.insert(config_db.markdown_content, user_id=user_id, content=content, content_date=content_date, article_id=content_id)
         data = {"content": g}
         # 插入导航表
