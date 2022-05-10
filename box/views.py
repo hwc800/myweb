@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render
 import db
 import wwd.config_db as config_db
@@ -55,11 +56,15 @@ def box_content(requests):
 def box_show_mode(requests):
     if requests.method == "GET":
         article_id = requests.GET.get("article_id")
+
+        if not article_id:
+            return JsonResponse({"data": "no"})
         result = db.select_markdown_content(article_id)
+
         if not result:
-            return
+            return JsonResponse({"data": "no"})
         content = result[0]["content"]
         data = {
-            "content": content
+            "content": content,
         }
         return render(requests, "page/show_mode.html", data)

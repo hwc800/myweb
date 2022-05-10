@@ -93,10 +93,9 @@
 
 		<script src="static/markdown/markdown.min.js"></script>
 		<script>
-			var content='{{ content }}';
 			function Editor(preview) {
 				this.update = function() {
-					preview.innerHTML = markdown.toHTML("content");
+					preview.innerHTML = markdown.toHTML('{{ content }}');
 				};
 				this.update();
 			}
