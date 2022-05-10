@@ -70,6 +70,9 @@ def box_show_mode(requests):
             content = content.replace("\t", "\\t")
         elif "\a" in content:
             content = content.replace("\a", "\\a")
+        if not title:
+            return JsonResponse({"data": "no"})
+        title = title[0]["article_title"]
         data = {
             "content": content,
             "title": title,
