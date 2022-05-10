@@ -64,7 +64,15 @@ def box_show_mode(requests):
         if not result:
             return JsonResponse({"data": "no"})
         content = result[0]["content"]
+        if "\n" in content:
+            content = content.replace("\n", "\\n")
+        elif "\t" in content:
+            content = content.replace("\t", "\\t")
+        elif "\a" in content:
+            content = content.replace("\a", "\\a")
         data = {
             "content": content,
         }
+        print(data)
         return render(requests, "page/show_mode.html", data)
+

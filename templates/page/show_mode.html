@@ -93,7 +93,6 @@
 
 		<script src="static/markdown/markdown.min.js"></script>
 		<script>
-			alert({{ content }});
 			function Editor(preview) {
 				this.update = function() {
 					preview.innerHTML = markdown.toHTML('{{ content }}');
