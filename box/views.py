@@ -73,6 +73,5 @@ def box_show_mode(requests):
         data = {
             "content": content,
         }
-        print(data)
         return render(requests, "page/show_mode.html", data)
 
