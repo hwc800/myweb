@@ -34,14 +34,12 @@ class MySql(object):
             cursor = self.db.cursor()
             # 查询是否有连接在一个状态超过指定时间，超过则杀掉
             sql = "SHOW PROCESSLIST;"
-            print(sql)
             try:
                 cursor.execute(sql)
             except:
                 raise SyntaxError("执行SHOW PROCESSLIST;语句失败")
             stat = cursor.fetchall()
             for client in stat:
-                print(client, datetime.datetime.now())
                 this_ip = client[2].split(":")[0]
                 if client[2] != 'localhost' and client[3] == aim_db and this_ip != ip:
                     sql = f"kill {client[0]};"
@@ -95,7 +93,6 @@ class Table(object):
         value = ','.join(values)
         cursor = self.db.cursor()
         sql = f"insert into {self.table}({key}) value ({value});"
-        print(sql)
         try:
             cursor.execute(sql)
         except:
