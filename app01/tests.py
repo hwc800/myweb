@@ -206,11 +206,13 @@ if __name__ == "__main__":
         "user_id": "int(10)",
         "comment_link": "text",
         "comment": "text",
+        "comment_id": "VARCHAR(250)",
         "date": "text"
     }
     # 这个表用来支撑主页，主页回列出所有文章
     user_data = {
-        "user_id": "int(10)",
+        "article_id": "VARCHAR(250)",
+        "user_id": "text",
         "article_title": "text",
         "article_introduce": "text",
         "article_link": "text",
@@ -218,14 +220,14 @@ if __name__ == "__main__":
     }
     # 这个表用保存markdown文档内容
     markdown_content = {
-        "content_id": "VARCHAR(250)",
+        "article_id": "VARCHAR(250)",
         "user_id": "text",
         "content": "text",
-        "content_data": "text",
+        "content_date": "text",
     }
-
+    #
     # conn = DatabaseOperation(ip="118.195.188.25", pwd="123456789", user="root", database="hwc")
-    # conn.creat_table(table_name="markdown_content", fiels=markdown_content, primary_key="content_id")
+    # conn.creat_table(table_name="user_comment", fiels=user_comment, primary_key="comment_id")
 
     # conn = DatabaseOperation(ip="9.135.94.3", pwd="123456789", user="root", database="version_num")
     # conn.change_field_name(table_name="version_code", old_name="center_number", new_name="top_fourth", new_field_class="varchar(125)")

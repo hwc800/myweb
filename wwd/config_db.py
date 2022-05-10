@@ -48,10 +48,12 @@ user_comment = {
     "user_id": "int(10)",
     "comment_link": "text",
     "comment": "text",
+    "comment_id": "VARCHAR(250)",
     "date": "text"
 }
 """
 user_comment = "user_comment"
+user_comment_comment_id = "comment_id"
 user_comment_user_id = "user_id"
 user_comment_comment_link = "comment_link"
 user_comment_comment = "comment"
@@ -61,14 +63,16 @@ user_comment_date = "date"
 
 """
 user_data = {
-    "user_id": "int(10)",
-    "article_title": "text",
-    "article_introduce": "text",
-    "article_link": "text",
-    "date": "text",
-}
+        "article_id": "VARCHAR(250)",
+        "user_id": "text",
+        "article_title": "text",
+        "article_introduce": "text",
+        "article_link": "text",
+        "date": "text",
+    }
 """
 user_data = "user_data"
+user_data_article_id = "article_id"
 user_data_user_id = "user_id"
 user_data_article_title = "article_title"
 user_data_article_introduce = "article_introduce"
@@ -76,15 +80,17 @@ user_data_article_link = "article_link"
 user_data_date = "date"
 """
 markdown_content = {
-    "user_id": "int(10)",
-    "content": "text",
-    "content_data": "text",
-}
+        "article_id": "VARCHAR(250)",
+        "user_id": "text",
+        "content": "text",
+        "content_date": "text",
+    }
 """
 # 保存文章内容的表
 markdown_content = "markdown_content"
+markdown_content_article_id = "article_id"
 markdown_content_user_id = "user_id"
 markdown_content_content = "content"
-markdown_content_content_data = "content_data"
+markdown_content_content_data = "content_date"
 
 
