@@ -84,7 +84,7 @@
 		// 使用 jQuery
 		jQuery("div p").hide();
 
-			function saved_to_server(content,content_title,content_introduce){
+			function saved_to_server(content,content_title,article_introduce){
 				jQuery.ajax({
 					type:"post",
 					url:"/box_content",
@@ -94,7 +94,7 @@
 					data:{
 						"content": content,
 						"content_title": content_title,
-						"content_introduce": content_introduce,
+						"article_introduce": article_introduce,
 					},
 					success:function(data){
 						if(data=1){alert("成功");}
@@ -144,6 +144,7 @@
 				var content = document.getElementById("text-input").value;
 				var content_title = document.getElementById("content_title").value;
 				var article_introduce = document.getElementById("content_introduce").value;
+				alert(article_introduce)
 				saved_to_server(content,content_title,article_introduce);
 
 				};
