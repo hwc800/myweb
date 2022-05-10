@@ -350,7 +350,7 @@ def insert(tble, **kwargs):
 def select_markdown_content(article_id):
     """查询文章简介表"""
     files = ["user_id", "content", "content_date"]
-    sql = "select user_id, content, content_date from %s where article_id=%s;" % (config_db.user_data, article_id)
+    sql = "select user_id, content, content_date from %s where article_id=%s;" % (config_db.markdown_content, article_id)
     print(sql)
     db = MySql(config_db.HOST, config_db.USER, config_db.PWD, config_db.DATABASE)
     # 操作表类
