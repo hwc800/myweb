@@ -348,7 +348,7 @@ def insert(tble, **kwargs):
 
 
 def select_markdown_content(article_id):
-    """查询文章简介表"""
+    """查询文章内容"""
     files = ["user_id", "content", "content_date"]
     sql = "select user_id, content, content_date from %s where article_id=%s;" % (config_db.markdown_content, article_id)
     db = MySql(config_db.HOST, config_db.USER, config_db.PWD, config_db.DATABASE)
@@ -357,13 +357,18 @@ def select_markdown_content(article_id):
     g = table.auto_select(sql)
     result = db_dict(files, g)
     return result
-# c = select_user_comment("http://www.boygirs/thirst")
-# print(c)
-# import datetime
-#
-# f = str(datetime.datetime.now())
-# print(f[:19])
-# g = article_title(10000)
-# print(g)
+
+
+def select(table, **kwargs):
+    db = MySql(config_db.HOST, config_db.USER, config_db.PWD, config_db.DATABASE)
+    # 操作表类
+    table = db.usetable(table, config_db.DATABASE)
+    kes = []
+    for key in kwargs:
+        kes.append({key: kwargs[key], "op": "="})
+    result = table.multiple_select(kes)
+    return result
+
+
 
 

@@ -60,7 +60,7 @@ def box_show_mode(requests):
         if not article_id:
             return JsonResponse({"data": "no"})
         result = db.select_markdown_content(article_id)
-
+        title = db.select(config_db.user_data, article_id=article_id)
         if not result:
             return JsonResponse({"data": "no"})
         content = result[0]["content"]
@@ -72,6 +72,7 @@ def box_show_mode(requests):
             content = content.replace("\a", "\\a")
         data = {
             "content": content,
+            "title": title,
         }
         return render(requests, "page/show_mode.html", data)
 
